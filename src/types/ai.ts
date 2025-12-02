@@ -1,6 +1,6 @@
 import z from "zod";
 
-const taskSchema = z.object({
+export const taskSchema = z.object({
   title: z.string().describe("The title of the task."),
   category: z.string().describe("The category of the task."),
   priority: z.enum(["high", "medium", "low"]).describe("The priority level of the task."),
