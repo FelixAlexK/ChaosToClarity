@@ -10,6 +10,8 @@ interface BrainDumpInputProps {
   isProcessing: boolean;
 }
 
+const MAX_CONTENT_LENGTH = 2000;
+
 export function BrainDumpInput({ onSubmit, isProcessing }: BrainDumpInputProps) {
   const [content, setContent] = useState('');
 
@@ -28,13 +30,26 @@ export function BrainDumpInput({ onSubmit, isProcessing }: BrainDumpInputProps) 
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className='h-80'
+            className='h-80 max-w-4xl'
+            maxLength={MAX_CONTENT_LENGTH}
             placeholder="Dump everything on your mind here... tasks, ideas, worries, goals, appointments - anything and everything. Don't worry about organizing it, just get it all out."
             disabled={isProcessing}
           />
           {content.length > 0 && (
             <div className="absolute bottom-4 right-4 text-sm text-gray-400">
-              {content.length} characters
+              {content.length} / {MAX_CONTENT_LENGTH} characters
+            </div>
+          )}
+          {content.length > 0 && (
+            <div className="absolute bottom-4 left-4 text-sm text-gray-400">
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => setContent('')}
+                disabled={isProcessing}
+              >
+                Clear
+              </Button>
             </div>
           )}
         </div>
