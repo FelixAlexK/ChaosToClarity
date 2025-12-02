@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Sparkles } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Spinner} from "@/components/ui/spinner"
+import { OrganizeButton } from './OrganizeButton';
 
 
 interface BrainDumpInputProps {
@@ -54,23 +53,7 @@ export function BrainDumpInput({ onSubmit, isProcessing }: BrainDumpInputProps) 
           )}
         </div>
 
-        <Button
-          type="submit"
-          disabled={!content.trim() || isProcessing}
-
-        >
-          {isProcessing ? (
-            <>
-              <Spinner className="w-5 h-5" />
-              <span>Creating your plan...</span>
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-5 h-5" />
-              <span>Transform into Weekly Plan</span>
-            </>
-          )}
-        </Button>
+        <OrganizeButton isProcessing={isProcessing} content={content}></OrganizeButton>
       </form>
 
     </div>
