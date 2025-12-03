@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { BrainDumpInput } from './components/BrainDumpInput'
 import { Calendar } from './components/Calendar'
 import { CalendarDayHeader } from './components/CalendarDayHeader'
+import { ModeToggle } from './components/ModeToggle'
 import { TaskCard } from './components/TaskCard'
 import { sendBrainDumpToGemini } from './services/gemini'
 
@@ -49,15 +50,33 @@ function App() {
   }
 
   return (
-    <div className="w-full max-w-4xl space-y-4 mx-auto p-1 md:px-4 py-8">
-      <BrainDumpInput onSubmit={handleBrainDumpSubmit} isProcessing={isProcessing}></BrainDumpInput>
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mx-auto max-w-4xl">
-        {taskCards}
-      </div>
-      <div>
-        <Calendar onYearAndMonthChange={setYearAndMonth} yearAndMonth={yearAndMonth} renderDay={day => <CalendarDayHeader weeklyPlan={weeklyPlan} calendarDayObject={day} />}></Calendar>
-      </div>
-    </div>
+    <>
+      {' '}
+      <header className="w-full max-w-4xl flex justify-center mx-auto p-1 md:px-4 pt-8">
+        <div className="flex justify-between  items-center w-full">
+
+          <h1 className="flex justify-center w-full text-xl font-bold">Chaos to Clarity</h1>
+
+          <ModeToggle></ModeToggle>
+
+        </div>
+
+      </header>
+      <main>
+        <div className="w-full max-w-4xl space-y-4 mx-auto p-1 md:px-4 pb-8">
+          <BrainDumpInput onSubmit={handleBrainDumpSubmit} isProcessing={isProcessing}></BrainDumpInput>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mx-auto max-w-4xl">
+            {taskCards}
+          </div>
+          <div>
+            <Calendar onYearAndMonthChange={setYearAndMonth} yearAndMonth={yearAndMonth} renderDay={day => <CalendarDayHeader weeklyPlan={weeklyPlan} calendarDayObject={day} />}></Calendar>
+          </div>
+        </div>
+      </main>
+      {' '}
+
+    </>
+
   )
 }
 
