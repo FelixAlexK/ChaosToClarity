@@ -2,12 +2,12 @@ import type { JSX } from 'react'
 import type z from 'zod'
 import type { responseSchema } from './types/ai'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { BrainDumpInput } from './components/BrainDumpInput'
 import { Calendar } from './components/Calendar'
 import { CalendarDayHeader } from './components/CalendarDayHeader'
 import { TaskCard } from './components/TaskCard'
 import { sendBrainDumpToGemini } from './services/gemini'
-import { toast } from "sonner"
 
 function App() {
   const [isProcessing, setIsProcessing] = useState(false)
@@ -20,13 +20,12 @@ function App() {
       setIsProcessing(true)
 
       const response = await sendBrainDumpToGemini(content)
-        const taskCards = response.tasks.map((task, index) => <TaskCard key={index} task={task}></TaskCard>)
-        const weeklyPlan = response.weekly_plan
+      const taskCards = response.tasks.map((task, index) => <TaskCard key={index} task={task}></TaskCard>)
+      const weeklyPlan = response.weekly_plan
 
-        setWeeklyPlan(weeklyPlan)
-        setTaskCards(taskCards)
-        toast.info("AI generated your weekly plan!")
-
+      setWeeklyPlan(weeklyPlan)
+      setTaskCards(taskCards)
+      toast.info('AI generated your weekly plan!')
     }
     catch (error) {
       console.error('Error processing brain dump:', error)
@@ -41,23 +40,24 @@ function App() {
             label: 'Retry',
             onClick: () => handleBrainDumpSubmit(content),
           },
-        }
+        },
       )
-    } finally {
+    }
+    finally {
       setIsProcessing(false)
     }
   }
 
   return (
-      <div className="w-full max-w-4xl space-y-4 mx-auto p-1 md:px-4 py-8">
-        <BrainDumpInput onSubmit={handleBrainDumpSubmit} isProcessing={isProcessing}></BrainDumpInput>
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mx-auto max-w-4xl">
-          {taskCards}
-        </div>
-        <div>
-          <Calendar onYearAndMonthChange={setYearAndMonth} yearAndMonth={yearAndMonth} renderDay={day => <CalendarDayHeader weeklyPlan={weeklyPlan} calendarDayObject={day} />}></Calendar>
-        </div>
+    <div className="w-full max-w-4xl space-y-4 mx-auto p-1 md:px-4 py-8">
+      <BrainDumpInput onSubmit={handleBrainDumpSubmit} isProcessing={isProcessing}></BrainDumpInput>
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mx-auto max-w-4xl">
+        {taskCards}
       </div>
+      <div>
+        <Calendar onYearAndMonthChange={setYearAndMonth} yearAndMonth={yearAndMonth} renderDay={day => <CalendarDayHeader weeklyPlan={weeklyPlan} calendarDayObject={day} />}></Calendar>
+      </div>
+    </div>
   )
 }
 

@@ -1,26 +1,24 @@
+// eslint.config.mjs
 import antfu from '@antfu/eslint-config'
 
-export default antfu(
-  {
-    type: 'app',
+export default antfu({
+  react: true,
+  typescript: true,
+  jsx: true,
+  basePath: '.',
+  formatters: true,
+  jsonc: true,
+  ignores:
+    ['dist/*', 'node_modules/*', 'public/*', './src/components/ui/*', './eslint.config.js'],
 
-    ignores: [
-      'vite.config.*',
-      'eslint.config.js',
-      './src/components/ui/**',
-      './convex/**'
-    ],
+  rules: {
+    'react/no-comment-textnodes': 'off',
+    'react-hooks-extra/no-unnecessary-use-prefix': 'off',
+    'react-hooks-extra/prefer-use-state-lazy-initialization': 'off',
+    'unused-imports/no-unused-vars': 'warn',
+    'node/prefer-global/process': 'off',
+    'ts/no-use-before-define': 'warn'
+  },
 
-    gitignore: true,
 
-    stylistic: true,
-    formatters: true,
-
-    typescript: true,
-
-    react: true,
-
-    jsonc: true,
-    yaml: true,
-  }
-)
+})

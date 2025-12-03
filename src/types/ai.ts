@@ -15,8 +15,6 @@ export const daySchema = z.object({
   end: z.string().describe('Deadline for the task.'),
 })
 
-
-
 export const responseSchema = z.object({
   tasks: z.array(taskSchema).describe('A list of organized tasks.'),
   weekly_plan: z.object({
