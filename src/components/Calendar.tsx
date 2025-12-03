@@ -99,16 +99,16 @@ export function Calendar({ yearAndMonth, renderDay, onYearAndMonthChange }: Cale
           <Button onClick={handleMonthNavForwardButtonClick}>Next</Button>
         </div>
       </div>
-      <div className="w-full grid grid-cols-7 gap-0.5 box-border days-of-week">
+      <div className="w-full grid grid-cols-7 gap-0.5 box-border ">
         {daysOfWeek.map((day, index) => (
-          <div key={index} className="py-2 min-w-0 truncate day-of-week-header-cell">
+          <div key={index} className="py-2 min-w-0 truncate ">
             {day}
           </div>
         ))}
       </div>
-      <div className="w-full grid grid-cols-7 h-[700px] overflow-hidden days-grid bg-black gap-px border border-r-white border-black box-border">
+      <div className="w-full grid grid-cols-7 h-[700px] overflow-hidden days-grid bg-black dark:bg-white gap-px border border-r-white dark:border-r-black border-black dark:border-white box-border">
         {calendarGridDayObjects.map(day => (
-          <div className="bg-white" key={day.dateString}>
+          <div className="bg-white dark:bg-black" key={day.dateString}>
             <div className="flex-1 min-h-0">{renderDay(day) }</div>
           </div>
         ))}
