@@ -8,7 +8,7 @@ interface BrainDumpInputProps {
   isProcessing: boolean
 }
 
-const MAX_CONTENT_LENGTH = 2000
+const MAX_CONTENT_LENGTH = 1500
 
 export function BrainDumpInput({ onSubmit, isProcessing }: BrainDumpInputProps) {
   const [content, setContent] = useState('')
