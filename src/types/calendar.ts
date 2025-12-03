@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod'
 
 export const monthDaySchema = z.object({
   dateString: z.string(),
@@ -6,4 +6,4 @@ export const monthDaySchema = z.object({
   isCurrentMonth: z.boolean(),
   isNextMonth: z.boolean(),
   isPreviousMonth: z.boolean(),
-});
+})

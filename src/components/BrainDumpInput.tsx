@@ -1,26 +1,25 @@
-import { useState } from 'react';
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { OrganizeButton } from './OrganizeButton';
-
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { OrganizeButton } from './OrganizeButton'
 
 interface BrainDumpInputProps {
-  onSubmit?: (content: string) => Promise<void>;
-  isProcessing: boolean;
+  onSubmit?: (content: string) => Promise<void>
+  isProcessing: boolean
 }
 
-const MAX_CONTENT_LENGTH = 2000;
+const MAX_CONTENT_LENGTH = 2000
 
 export function BrainDumpInput({ onSubmit, isProcessing }: BrainDumpInputProps) {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (content.trim() && !isProcessing) {
-      await onSubmit!(content);
-      setContent('');
+      await onSubmit!(content)
+      setContent('')
     }
-  };
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -28,15 +27,20 @@ export function BrainDumpInput({ onSubmit, isProcessing }: BrainDumpInputProps) 
         <div className="relative">
           <Textarea
             value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className='h-80 max-w-4xl'
+            onChange={e => setContent(e.target.value)}
+            className="h-80 max-w-4xl"
             maxLength={MAX_CONTENT_LENGTH}
             placeholder="Dump everything on your mind here... tasks, ideas, worries, goals, appointments - anything and everything. Don't worry about organizing it, just get it all out."
             disabled={isProcessing}
           />
           {content.length > 0 && (
             <div className="absolute bottom-4 right-4 text-sm text-gray-400">
-              {content.length} / {MAX_CONTENT_LENGTH} characters
+              {content.length}
+              {' '}
+              /
+              {MAX_CONTENT_LENGTH}
+              {' '}
+              characters
             </div>
           )}
           {content.length > 0 && (
@@ -57,5 +61,5 @@ export function BrainDumpInput({ onSubmit, isProcessing }: BrainDumpInputProps) 
       </form>
 
     </div>
-  );
+  )
 }
