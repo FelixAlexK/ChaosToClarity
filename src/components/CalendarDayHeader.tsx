@@ -58,23 +58,26 @@ export function CalendarDayHeader({calendarDayObject, weeklyPlan}: CalendarDayHe
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <div className="p-2 min-w-0">
-<span className="font-bold">{calendarDayObject.dayOfMonth}</span>
-      <div className="flex flex-wrap gap-1 mt-2 min-w-0 items-start">
-         {tasksForDay.map((task, i) => (
-           <Badge
-             key={i}
-             variant={task.isDeadline ? "destructive" : "default"}
-             title={task.label}
-             className="truncate max-w-full min-w-0 text-left justify-start items-start "
-           >
-             {task.label}
-           </Badge>
-         ))}
-       </div>
+      <div className="p-2 min-w-0 text-left">
+        <span className="font-bold block">{calendarDayObject.dayOfMonth}</span>
 
-       </div>
-
-       </div>
-   );
+        <div className="flex flex-wrap gap-1 mt-2 min-w-0 items-start justify-start">
+          {tasksForDay.map((t, i) => {
+            const label = String(t.label);
+            const isDeadline = Boolean(t.isDeadline);
+            return (
+              <Badge
+                key={i}
+                variant={isDeadline ? "destructive" : "default"}
+                title={label}
+                className="truncate max-w-full min-w-0 text-left justify-start items-start overflow-hidden"
+              >
+                {label}
+              </Badge>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
  }
