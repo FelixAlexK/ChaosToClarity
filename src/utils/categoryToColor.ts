@@ -1,4 +1,3 @@
-
 export const categories = ['work', 'personal', 'health', 'finance', 'education', 'household', 'study'] as const
 
 const categoriesWithDefault = [...categories, 'default'] as const
