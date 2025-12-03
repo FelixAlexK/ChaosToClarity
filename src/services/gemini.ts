@@ -9,7 +9,7 @@ export async function sendBrainDumpToGemini(content: string): Promise<z.infer<ty
   // Placeholder function to simulate sending content to an AI service
  const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    contents: PROMPT_TEMPLATE + "\n\n" + content,
+    contents: PROMPT_TEMPLATE + `current date: ${new Date().toISOString().split('T')[0]}` + "\n\n" + content,
     config: {
       responseMimeType: "application/json",
       responseJsonSchema: z.toJSONSchema(responseSchema),
