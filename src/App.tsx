@@ -21,6 +21,7 @@ function App() {
       setIsProcessing(true)
 
       const response = await sendBrainDumpToGemini(content)
+      console.log('AI Response:', response)
       const taskCards = response.tasks.map((task, index) => <TaskCard key={index} task={task}></TaskCard>)
       const weeklyPlan = response.weekly_plan
 
