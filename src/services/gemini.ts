@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai'
 import { z } from 'zod'
-import PROMPT_TEMPLATE from '@/constants/prompt'
+import META_PROMPT from '@/constants/prompt'
 import { responseSchema } from '@/types/ai'
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GOOGLE_API_KEY })
@@ -19,7 +19,7 @@ export async function sendBrainDumpToGemini(content: string): Promise<z.infer<ty
   try {
     response = await ai.models.generateContent({
       model,
-      contents: `${PROMPT_TEMPLATE}current date: ${DATE}\n\n${content}`,
+      contents: `${META_PROMPT}current date: ${DATE}\n\n${content}`,
       config: {
         responseMimeType: 'application/json',
         responseJsonSchema: z.toJSONSchema(responseSchema),
