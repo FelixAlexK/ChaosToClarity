@@ -76,6 +76,7 @@ function App() {
       sendBrainDumpToGemini(content).then((response) => {
         const taskCards = response.tasks.map((task, index) => <TaskCard key={index} task={task}></TaskCard>)
         const weeklyPlan = response.weekly_plan
+        console.log(response)
         setWeeklyPlan(weeklyPlan)
         setTaskCards(taskCards)
         setIsProcessing(false)
