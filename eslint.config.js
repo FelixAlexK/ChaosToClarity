@@ -9,8 +9,10 @@ export default antfu({
   formatters: true,
   stylistic: true,
   jsonc: true,
+  basePath: '.',
+  isInEditor: true,
   ignores:
-    ['dist/*', 'node_modules/*', 'public/*', './src/components/ui/*', './eslint.config.js'],
+    ['**/dist/*', '**/node_modules/*', '**/public/*', './src/components/ui/*', './eslint.config.js'],
 
   rules: {
     'react/no-comment-textnodes': 'off',
