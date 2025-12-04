@@ -2,7 +2,7 @@ export const categories = ['work', 'personal', 'health', 'finance', 'education',
 
 const categoriesWithDefault = [...categories, 'default'] as const
 
-export function categoryToColor(category: string, opacity: number = 100): string {
+export function getCategoryHex(category: string): string {
   const map: Record<typeof categoriesWithDefault[number], string> = {
     work: '#3B82F6', // blue-500
     personal: '#10B981', // green-500
@@ -15,6 +15,11 @@ export function categoryToColor(category: string, opacity: number = 100): string
   }
 
   const hex = map[category.toLowerCase() as typeof categoriesWithDefault[number]] ?? map.default
+
+  return hex
+}
+
+export function getCustomColor(hex: string, opacity: number = 100): string {
   const clamped = Math.max(0, Math.min(100, Math.round(opacity)))
 
   if (clamped >= 100)
@@ -27,4 +32,3 @@ export function categoryToColor(category: string, opacity: number = 100): string
 
   return `rgba(${r}, ${g}, ${b}, ${a})`
 }
-// ...existing code...
