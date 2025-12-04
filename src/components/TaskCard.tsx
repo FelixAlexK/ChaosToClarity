@@ -4,8 +4,7 @@ import { is } from 'date-fns/locale'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
-import { Slider } from '@/components/ui/slider'
-import { categoryToColor } from '@/utils/categoryToColor'
+import { getCategoryHex, getCustomColor } from '@/utils/categoryToColor'
 import { Button } from './ui/button'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
@@ -24,6 +23,9 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
   const [newPriority, setNewPriority] = useState(task.priority)
   const [newEstimatedTime, setNewEstimatedTime] = useState(task.estimated_time)
   const [newDeadline, setNewDeadline] = useState(task.deadline)
+  const [color, setColor] = useState(task.color ?? (() => getCustomColor(getCategoryHex(task.category), 100))())
+
+  const [currentColor, setCurrentColor] = useState(color)
 
   const handleSave = () => {
     updateTask({
@@ -33,7 +35,14 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
       priority: newPriority,
       estimated_time: newEstimatedTime,
       deadline: newDeadline,
+      color,
     })
+    setIsEditing(false)
+  }
+
+  const handleCancel = () => {
+    setColor(currentColor)
+
     setIsEditing(false)
   }
 
@@ -61,8 +70,8 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
     <Card
       className="w-full"
       style={{
-        backgroundColor: `${categoryToColor(task.category, 20)}`,
-        border: `1px solid ${categoryToColor(task.category, 60)}`,
+        backgroundColor: `${getCustomColor(color, 20)}`,
+        border: `1px solid ${getCustomColor(color, 60)}`,
       }}
     >
       {!isEditing && (
@@ -135,7 +144,15 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
             <Input
               onChange={e => setNewDeadline(e.target.value)}
               type="date"
-              value={task.deadline ?? ''}
+
+            />
+
+            <Input
+              onClick={e => setCurrentColor(e.currentTarget.value)}
+              onChange={e => setColor(e.target.value)}
+              type="color"
+
+              value={color}
             />
           </CardContent>
         </>
@@ -152,7 +169,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
         <Button
           variant="link"
           className=""
-          onClick={() => setIsEditing(false)}
+          onClick={() => handleCancel()}
         >
           {isEditing && 'Cancel'}
         </Button>
