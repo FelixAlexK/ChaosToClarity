@@ -7,9 +7,12 @@ export default antfu({
   jsx: true,
   basePath: '.',
   formatters: true,
+  stylistic: true,
   jsonc: true,
+  basePath: '.',
+  isInEditor: true,
   ignores:
-    ['dist/*', 'node_modules/*', 'public/*', './src/components/ui/*', './eslint.config.js'],
+    ['**/dist/*', '**/node_modules/*', '**/public/*', './src/components/ui/*', './eslint.config.js'],
 
   rules: {
     'react/no-comment-textnodes': 'off',
@@ -17,7 +20,8 @@ export default antfu({
     'react-hooks-extra/prefer-use-state-lazy-initialization': 'off',
     'unused-imports/no-unused-vars': 'warn',
     'node/prefer-global/process': 'off',
-    'ts/no-use-before-define': 'warn'
+    'ts/no-use-before-define': 'warn',
+    'react/no-use-context': 'warn'
   },
 
 
