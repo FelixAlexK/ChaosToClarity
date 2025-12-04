@@ -17,7 +17,7 @@ export const daySchema = z.object({
 
 export const responseSchema = z.object({
   tasks: z.array(taskSchema).describe('A list of organized tasks.'),
-  weekly_plan: z.object({
+  weeklyPlan: z.object({
     monday: z.array(daySchema).describe('Tasks for Monday.'),
     tuesday: z.array(daySchema).describe('Tasks for Tuesday.'),
     wednesday: z.array(daySchema).describe('Tasks for Wednesday.'),
@@ -27,3 +27,14 @@ export const responseSchema = z.object({
     sunday: z.array(daySchema).describe('Tasks for Sunday.'),
   }).describe('A weekly plan with tasks assigned to each day.'),
 })
+
+export const storageSchema = z.object({
+  id: z.uuid(),
+  createdAt: z.coerce.number(),
+  updatedAt: z.coerce.number(),
+  tasks: z.array(responseSchema.shape.tasks.element.extend({ id: z.uuid() })),
+  weeklyPlan: z.object({
+    id: z.uuid(),
+    plan: responseSchema.shape.weeklyPlan
+  }),
+})  
