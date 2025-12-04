@@ -10,6 +10,7 @@
         "@radix-ui/react-dropdown-menu": "^2.1.16",
         "@radix-ui/react-select": "^2.2.6",
         "@radix-ui/react-slot": "^1.2.4",
+        "@synckit-js/sdk": "^0.1.1",
         "@tailwindcss/vite": "^4.1.17",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -323,6 +324,8 @@
     "@sindresorhus/base62": ["@sindresorhus/base62@1.0.0", "", {}, "sha512-TeheYy0ILzBEI/CO55CP6zJCSdSWeRtGnHy8U8dWSUH4I68iqTsy7HkMktR4xakThc9jotkPQUXT4ITdbV7cHA=="],
 
     "@stylistic/eslint-plugin": ["@stylistic/eslint-plugin@5.6.1", "", { "dependencies": { "@eslint-community/eslint-utils": "^4.9.0", "@typescript-eslint/types": "^8.47.0", "eslint-visitor-keys": "^4.2.1", "espree": "^10.4.0", "estraverse": "^5.3.0", "picomatch": "^4.0.3" }, "peerDependencies": { "eslint": ">=9.0.0" } }, "sha512-JCs+MqoXfXrRPGbGmho/zGS/jMcn3ieKl/A8YImqib76C8kjgZwq5uUFzc30lJkMvcchuRn6/v8IApLxli3Jyw=="],
+
+    "@synckit-js/sdk": ["@synckit-js/sdk@0.1.1", "", { "peerDependencies": { "react": ">=18.0.0" }, "optionalPeers": ["react"] }, "sha512-um+63DRMYjtbrdkrl/MJlaiVZgdpmXs8Mao3fGt5Uex7LKQsQC+hgBzbzQDDlfNiI23pzzYvgB1a9dByuGjcmA=="],
 
     "@tailwindcss/node": ["@tailwindcss/node@4.1.17", "", { "dependencies": { "@jridgewell/remapping": "^2.3.4", "enhanced-resolve": "^5.18.3", "jiti": "^2.6.1", "lightningcss": "1.30.2", "magic-string": "^0.30.21", "source-map-js": "^1.2.1", "tailwindcss": "4.1.17" } }, "sha512-csIkHIgLb3JisEFQ0vxr2Y57GUNYh447C8xzwj89U/8fdW8LhProdxvnVH6U8M2Y73QKiTIH+LWbK3V2BBZsAg=="],
 
