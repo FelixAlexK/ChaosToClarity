@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 
 interface CalendarDayHeaderProps {
   calendarDayObject: z.infer<typeof monthDaySchema>
-  weeklyPlan: z.infer<typeof responseSchema>['weekly_plan'] | null
+  weeklyPlan: z.infer<typeof responseSchema>['weeklyPlan'] | null
 }
 
 export function CalendarDayHeader({ calendarDayObject, weeklyPlan }: CalendarDayHeaderProps) {
