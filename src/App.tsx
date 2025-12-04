@@ -1,9 +1,11 @@
 import { SyncKit, SyncProvider } from '@synckit-js/sdk'
 import { useEffect, useState } from 'react'
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 import ChaosToClarityApp from './components/ChaosToClarityApp'
-import { ModeToggle } from './components/ModeToggle'
-import { ThemeProvider } from './components/themeProvider'
+
+const sync = new SyncKit({
+  storage: 'indexeddb',
+})
 
 function App() {
   const [synckit, setSynckit] = useState<SyncKit | null>(null)
@@ -12,11 +14,6 @@ function App() {
   useEffect(() => {
     const initSyncKit = async () => {
       try {
-        const sync = new SyncKit({
-          storage: 'indexeddb',
-          name: 'chaos-to-clarity-db',
-        })
-
         await sync.init()
         setSynckit(sync)
       }
@@ -40,7 +37,6 @@ function App() {
   }
 
   return (
-
     <SyncProvider synckit={synckit}>
 
       <ChaosToClarityApp></ChaosToClarityApp>
