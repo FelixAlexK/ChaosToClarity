@@ -1,8 +1,6 @@
-import type { JSX } from 'react'
 import type z from 'zod'
-import type { responseSchema, storageSchema } from '@/types/ai'
-import { useSyncDocument } from '@synckit-js/sdk'
-import { se } from 'date-fns/locale'
+import type { storageSchema } from '@/types/ai'
+import { useSyncDocument, useSyncKit } from '@synckit-js/sdk'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { sendBrainDumpToGemini } from '@/services/gemini'
@@ -10,12 +8,12 @@ import { BrainDumpInput } from './BrainDumpInput'
 import { Calendar } from './Calendar'
 import { CalendarDayHeader } from './CalendarDayHeader'
 import { ModeToggle } from './ModeToggle'
+import { SettingsDropdown } from './SettingsDropdown'
 import { TaskCard } from './TaskCard'
 
 const DOCUMENT_ID = import.meta.env.VITE_DOCUMENT_ID as string || 'ctc-id'
 
 type StorageDocument = z.infer<typeof storageSchema>
-type AIResponse = z.infer<typeof responseSchema>
 type Task = z.infer<typeof storageSchema>['tasks'][number]
 
 export default function ChaosToClarityApp() {
@@ -24,8 +22,10 @@ export default function ChaosToClarityApp() {
   const [error, setError] = useState<string | null>(null)
   const hasInitialized = useRef(false)
 
+  const sync = useSyncKit()
+
   // Use SyncKit's React hook - this persists automatically
-  const [document, { update: updateDocument, set: setDocument }] = useSyncDocument<StorageDocument>(DOCUMENT_ID)
+  const [document, { update: updateDocument }] = useSyncDocument<StorageDocument>(DOCUMENT_ID)
 
   // Initialize document if it doesn't exist
   useEffect(() => {
@@ -141,13 +141,18 @@ export default function ChaosToClarityApp() {
     toast.success('Task updated!')
   }
 
+  const handleClearAllData = async () => {
+    if (!document)
+      return
+
+    await sync.clearAll()
+
+    toast.info('All data cleared.')
+  }
+
   // Show loading state while document initializes
   if (!document) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">Loading...</div>
-      </div>
-    )
+    toast.loading('Syncing data...')
   }
 
   if (error) {
@@ -157,11 +162,15 @@ export default function ChaosToClarityApp() {
 
   return (
     <>
-      <header className="w-full max-w-4xl flex justify-center mx-auto p-1 md:px-4 pt-8">
-        <div className="flex justify-between items-center w-full">
-          <h1 className="flex justify-center w-full text-xl font-bold">Chaos to Clarity</h1>
-          <ModeToggle />
+      <header className="w-full max-w-4xl mx-auto  p-1 md:px-4 pt-8">
+        <div className="flex flex-row w-full justify-between items-center">
+          <h1 className=" text-xl font-bold">Chaos to Clarity</h1>
+          <div className="flex gap-2 ">
+            <ModeToggle />
+            <SettingsDropdown clearAllData={handleClearAllData}></SettingsDropdown>
+          </div>
         </div>
+
       </header>
 
       <div className="w-full max-w-4xl space-y-4 mx-auto p-1 md:px-4 pb-8">
