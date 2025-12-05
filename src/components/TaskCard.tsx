@@ -1,12 +1,11 @@
 import type z from 'zod'
 import type { storageSchema, taskSchema } from '@/types/ai'
-import { is } from 'date-fns/locale'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
-import { getCategoryHex, getCustomColor } from '@/utils/categoryToColor'
+import { getCategoryHex, getCustomColor } from '@/utils/colors'
 import { Button } from './ui/button'
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 type Task = z.infer<typeof storageSchema>['tasks'][number]
@@ -57,13 +56,13 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
       setNewDeadline(task.deadline)
 
       toast.info('Edit cancelled')
+      e.preventDefault()
     }
 
     if (e.key === 'Enter' && isEditing) {
       handleSave()
+      e.preventDefault()
     }
-
-    e.preventDefault()
   })
 
   return (
@@ -109,20 +108,20 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
               onChange={e => setNewCategory(e.target.value)}
 
               type="text"
-              value={task.category}
+              placeholder={task.category}
             />
             <Input
               onChange={e => setNewTitle(e.target.value)}
 
               type="text"
-              value={task.title}
+              placeholder={task.title}
             />
           </CardHeader>
           <CardContent className="space-y-2">
 
-            <Select value={task.priority} onValueChange={value => setNewPriority(value as z.infer<typeof taskSchema>['priority'])}>
+            <Select onValueChange={value => setNewPriority(value as z.infer<typeof taskSchema>['priority'])}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue className="capitalize" />
+                <SelectValue placeholder={task.priority} className="capitalize" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="high">High</SelectItem>
@@ -137,7 +136,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
               }}
 
               type="text"
-              value={`${task.estimated_time}`}
+              placeholder={`${task.estimated_time}`}
 
             />
 
