@@ -1,17 +1,18 @@
-"use client"
+'use client'
 
-import type { storageSchema } from '@/types/ai'
-import { useEffect, useState, type SetStateAction } from 'react'
+import type { SetStateAction } from 'react'
+import type { Event } from 'react-big-calendar'
 
-import { type Event, Views, dateFnsLocalizer } from 'react-big-calendar'
 import type z from 'zod'
+import type { storageSchema } from '@/types/ai'
 
-import {format, getDay, parse, startOfWeek} from 'date-fns'
+import { format, getDay, parse, startOfWeek } from 'date-fns'
 import { enUS } from 'date-fns/locale'
-
+import { useEffect, useState } from 'react'
+import { dateFnsLocalizer, Views } from 'react-big-calendar'
 
 import ShadcnBigCalendar from './shadcn-big-calendar/shadcn-big-calendar'
-
+import { set } from 'zod'
 
 interface CalendarProps {
   weeklyPlan?: z.infer<typeof storageSchema>['weeklyPlan']
@@ -30,48 +31,46 @@ const localizer = dateFnsLocalizer({
 })
 
 export function Calendar({ weeklyPlan }: CalendarProps) {
-
-
-  
   const [events, setEvents] = useState<Event[]>([])
-  const [date, setDate] = useState<Date>(new Date());
-  const [view, setView] = useState(Views.WEEK);
+  const [date, setDate] = useState<Date>(new Date())
+  const [view, setView] = useState(Views.WEEK)
 
-
+  const newEvents: Event[] = []
   useEffect(() => {
     if (weeklyPlan) {
       const plan = weeklyPlan.plan
-      const newEvents: Event[] = []
 
       for (const [_, tasks] of Object.entries(plan)) {
-        tasks.forEach(task => {
+        tasks.forEach((task) => {
           newEvents.push({
             title: task.task,
             start: new Date(task.start),
             end: new Date(task.end),
-            allDay: true
+            allDay: true,
           })
         })
       }
-
       setEvents(newEvents)
-    } 
+      
+    }
   }, [weeklyPlan])
 
+  
+
   const handleNavigate = (newDate: Date) => {
-    setDate(newDate);
-  };
+    setDate(newDate)
+  }
 
   const handleViewChange = (newView: SetStateAction<any>) => {
-    setView(newView);
-  };
+    setView(newView)
+  }
 
   return (
     <>
-      
-        <ShadcnBigCalendar
+
+      <ShadcnBigCalendar
         localizer={localizer}
-        style={{ height: 600, width: "100%" }}
+        style={{ height: 600, width: '100%' }}
         className="border-border border-rounded-md border-solid border-2 rounded-lg" // Optional border
         selectable
         date={date}
@@ -80,8 +79,8 @@ export function Calendar({ weeklyPlan }: CalendarProps) {
         onView={handleViewChange}
         events={events}
       />
-      
+
     </>
-    
+
   )
 }
