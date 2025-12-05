@@ -181,14 +181,14 @@ export default function ChaosToClarityApp() {
         </div>
 
       </div>
-        <div className='p-4 pb-8'>
-          {document.weeklyPlan?.plan && (
-            <Calendar
-              weeklyPlan={document.weeklyPlan}
+      <div className="p-4 pb-8">
+        {document.weeklyPlan?.plan && (
+          <Calendar
+            weeklyPlan={document.weeklyPlan}
           />
-          
-          )}
-        </div>
+
+        )}
+      </div>
     </>
   )
 }
