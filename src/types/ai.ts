@@ -1,5 +1,5 @@
 import z from 'zod'
-import { categories } from '@/utils/categoryToColor'
+import { categories } from '@/utils/colors'
 
 export const taskSchema = z.object({
   title: z.string().describe('The title of the task.'),

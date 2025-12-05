@@ -1,22 +1,24 @@
 export const categories = ['work', 'personal', 'health', 'finance', 'education', 'household', 'study'] as const
 
-const categoriesWithDefault = [...categories, 'default'] as const
-
 export function getCategoryHex(category: string): string {
-  const map: Record<typeof categoriesWithDefault[number], string> = {
-    work: '#3B82F6', // blue-500
-    personal: '#10B981', // green-500
-    health: '#EF4444', // red-500
-    finance: '#EAB308', // yellow-500
-    education: '#8B5CF6', // purple-500
-    household: '#F97316', // orange-500
-    study: '#14B8A6', // teal-500
-    default: '#6B7280', // gray-500
+  switch (category.toLowerCase().trim()) {
+    case 'work':
+      return '#3b82f6'
+    case 'personal':
+      return '#22c55e'
+    case 'health':
+      return '#ef4444'
+    case 'finance':
+      return '#eab308'
+    case 'education':
+      return '#a855f7'
+    case 'household':
+      return '#f97316'
+    case 'study':
+      return '#14b8a6'
+    default:
+      return '#6b7280'
   }
-
-  const hex = map[category.toLowerCase() as typeof categoriesWithDefault[number]] ?? map.default
-
-  return hex
 }
 
 export function getCustomColor(hex: string, opacity: number = 100): string {
