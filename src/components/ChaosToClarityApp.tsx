@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { sendBrainDumpToGemini } from '@/services/gemini'
 import { BrainDumpInput } from './BrainDumpInput'
 import { Calendar } from './Calendar'
-import { CalendarDayHeader } from './CalendarDayHeader'
 import { ModeToggle } from './ModeToggle'
 import { SettingsDropdown } from './SettingsDropdown'
 import { TaskCard } from './TaskCard'
@@ -18,7 +17,6 @@ type Task = z.infer<typeof storageSchema>['tasks'][number]
 
 export default function ChaosToClarityApp() {
   const [isProcessing, setIsProcessing] = useState(false)
-  const [yearAndMonth, setYearAndMonth] = useState([new Date().getFullYear(), new Date().getMonth() + 1])
   const [error, setError] = useState<string | null>(null)
   const hasInitialized = useRef(false)
 
@@ -182,21 +180,15 @@ export default function ChaosToClarityApp() {
           ))}
         </div>
 
-        <div>
+      </div>
+        <div className='p-4 pb-8'>
           {document.weeklyPlan?.plan && (
             <Calendar
-              onYearAndMonthChange={setYearAndMonth}
-              yearAndMonth={yearAndMonth}
-              renderDay={day => (
-                <CalendarDayHeader
-                  weeklyPlan={document.weeklyPlan.plan}
-                  calendarDayObject={day}
-                />
-              )}
-            />
+              weeklyPlan={document.weeklyPlan}
+          />
+          
           )}
         </div>
-      </div>
     </>
   )
 }
