@@ -64,7 +64,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
 
   return (
     <Card
-      className={`w-full`}
+      className="w-full"
       style={{
         border: `1px solid ${getCustomColor(color, 60)}`,
         background: `linear-gradient(135deg, ${getCustomColor(color, 20)} 0%, ${getCustomColor(color, 10)} 100%)`,
@@ -172,7 +172,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
 function TaskCardDetail({ label, value, className }: { label: string, value: string, className?: string }) {
   return (
     <div className="flex flex-col gap-px">
-      <small className={`text-sm leading-none font-medium text-muted-foreground`}>{label}</small>
+      <small className="text-sm leading-none font-medium text-muted-foreground">{label}</small>
       <p className={`text-lg font-semibold ${className}`}>{value}</p>
     </div>
   )
