@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import type { PluginOption } from 'vite'
 import path from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
@@ -16,7 +17,7 @@ export default defineConfig({
       },
     }),
     tailwindcss(),
-    visualizer({ open: true }) as PluginOption,
+    visualizer({ open: import.meta.env.DEV }) as PluginOption,
   ],
 
   server: {
