@@ -22,7 +22,7 @@ export function BrainDumpInput({ onSubmit, isProcessing }: BrainDumpInputProps) 
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="flex-col flex">
       <form onSubmit={handleSubmit} className="grid w-full gap-2">
         <div className="relative">
           <Textarea

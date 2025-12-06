@@ -1,3 +1,4 @@
+import type { Response } from '@/types/ai'
 import { GoogleGenAI } from '@google/genai'
 import { z } from 'zod'
 import META_PROMPT from '@/constants/prompt'
@@ -5,7 +6,7 @@ import { responseSchema } from '@/types/ai'
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GOOGLE_API_KEY })
 
-export async function sendBrainDumpToGemini(content: string): Promise<z.infer<typeof responseSchema>> {
+export async function sendBrainDumpToGemini(content: string): Promise<Response> {
   const model = 'gemini-2.5-flash'
   const DATE = new Date().toISOString().split('T')[0]
 

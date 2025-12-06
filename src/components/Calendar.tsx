@@ -3,19 +3,17 @@
 import type { SetStateAction } from 'react'
 import type { Event } from 'react-big-calendar'
 
-import type z from 'zod'
-import type { storageSchema } from '@/types/ai'
+import type { WeeklyPlan } from '@/types/ai'
 
 import { format, getDay, parse, startOfWeek } from 'date-fns'
 import { enUS } from 'date-fns/locale'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { dateFnsLocalizer, Views } from 'react-big-calendar'
 
 import ShadcnBigCalendar from './shadcn-big-calendar/shadcn-big-calendar'
-import { set } from 'zod'
 
 interface CalendarProps {
-  weeklyPlan?: z.infer<typeof storageSchema>['weeklyPlan']
+  weeklyPlan?: WeeklyPlan
 }
 
 const locales = {
@@ -31,31 +29,28 @@ const localizer = dateFnsLocalizer({
 })
 
 export function Calendar({ weeklyPlan }: CalendarProps) {
-  const [events, setEvents] = useState<Event[]>([])
   const [date, setDate] = useState<Date>(new Date())
   const [view, setView] = useState(Views.WEEK)
 
-  const newEvents: Event[] = []
-  useEffect(() => {
-    if (weeklyPlan) {
-      const plan = weeklyPlan.plan
+  const events = useMemo(() => {
+    if (!weeklyPlan)
+      return []
 
-      for (const [_, tasks] of Object.entries(plan)) {
-        tasks.forEach((task) => {
-          newEvents.push({
-            title: task.task,
-            start: new Date(task.start),
-            end: new Date(task.end),
-            allDay: true,
-          })
+    const newEvents: Event[] = []
+    const plan = weeklyPlan.plan
+
+    for (const [_, tasks] of Object.entries(plan)) {
+      tasks.forEach((task) => {
+        newEvents.push({
+          title: task.task,
+          start: new Date(task.start),
+          end: new Date(task.end),
+          allDay: true,
         })
-      }
-      setEvents(newEvents)
-      
+      })
     }
+    return newEvents
   }, [weeklyPlan])
-
-  
 
   const handleNavigate = (newDate: Date) => {
     setDate(newDate)

@@ -7,3 +7,5 @@ export const monthDaySchema = z.object({
   isNextMonth: z.boolean(),
   isPreviousMonth: z.boolean(),
 })
+
+export type MonthDay = z.infer<typeof monthDaySchema>
