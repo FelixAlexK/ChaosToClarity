@@ -64,7 +64,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
 
   return (
     <Card
-      className="w-full"
+      className={`w-full`}
       style={{
         border: `1px solid ${getCustomColor(color, 60)}`,
         background: `linear-gradient(135deg, ${getCustomColor(color, 20)} 0%, ${getCustomColor(color, 10)} 100%)`,

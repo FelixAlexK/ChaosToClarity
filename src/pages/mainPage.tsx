@@ -45,26 +45,10 @@ export function MainPage() {
 
   // Initialize document if it doesn't exist
   useEffect(() => {
-    if (!document && !hasInitialized.current) {
-      hasInitialized.current = true
-      updateDocument({
-        id: DOCUMENT_ID,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        tasks: [],
-        weeklyPlan: {
-          id: '',
-          plan: {
-            monday: [],
-            tuesday: [],
-            wednesday: [],
-            thursday: [],
-            friday: [],
-            saturday: [],
-            sunday: [],
-          },
-        },
-      })
+    if (!syncState)
+      return
+    if (syncState?.state === 'syncing') {
+      toast.loading('Syncing...')
     }
   }, [])
 
