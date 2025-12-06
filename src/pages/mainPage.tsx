@@ -1,25 +1,18 @@
-import type z from 'zod'
-import type { storageSchema } from '@/types/ai'
+import type { StorageDocument, Task } from '@/types/ai'
 import { useSyncDocument, useSyncKit } from '@synckit-js/sdk'
+import { Calendar1, Grid2X2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { Calendar } from '@/components/Calendar'
+import { TaskCard } from '@/components/TaskCard'
+import { Button } from '@/components/ui/button'
+import { ToolLayout } from '@/layouts/toolLayout'
 import { sendBrainDumpToGemini } from '@/services/gemini'
 import { BrainDumpInput } from '../components/BrainDumpInput'
 import { ModeToggle } from '../components/ModeToggle'
 import { SettingsDropdown } from '../components/SettingsDropdown'
-import { Toggle } from "@/components/ui/toggle"
-import { Calendar1, Grid2X2 } from 'lucide-react'
-import { DocumentViews } from '../components/DocumentViews'
-import { ToolLayout } from '@/layouts/toolLayout'
-import { Button } from '@/components/ui/button'
-import { TaskCard } from '@/components/TaskCard'
-import { Calendar } from '@/components/Calendar'
-import { Separator } from '@/components/ui/separator'
 
 const DOCUMENT_ID = import.meta.env.VITE_DOCUMENT_ID as string || 'ctc-id'
-
-type StorageDocument = z.infer<typeof storageSchema>
-type Task = z.infer<typeof storageSchema>['tasks'][number]
 
 export function MainPage() {
   const [isProcessing, setIsProcessing] = useState(false)
@@ -165,15 +158,13 @@ export function MainPage() {
     setError(null)
   }
 
-
-
   return (
     <>
       <header className="mb-4 lg:mb-8 ">
         <div className="flex flex-row w-full justify-between items-center lg:mx-auto lg:max-w-4xl">
           <h1 className=" text-xl font-bold">Chaos to Clarity</h1>
           <div className="flex gap-2 ">
-            <Button variant={'outline'} onClick={() => setToggleView(!toggleView)}>{toggleView ? <Calendar1></Calendar1> : <Grid2X2></Grid2X2>}</Button>
+            <Button variant="outline" onClick={() => setToggleView(!toggleView)}>{toggleView ? <Calendar1></Calendar1> : <Grid2X2></Grid2X2>}</Button>
             <ModeToggle />
             <SettingsDropdown clearAllData={handleClearAllData}></SettingsDropdown>
           </div>
@@ -181,23 +172,24 @@ export function MainPage() {
       </header>
 
       <ToolLayout>
-        <div className='w-full lg:mx-auto lg:max-w-4xl  '>
+        <div className="w-full lg:mx-auto lg:max-w-4xl  ">
           <BrainDumpInput onSubmit={handleBrainDumpSubmit} isProcessing={isProcessing} />
         </div>
 
-        <div className='w-full lg:mx-auto lg:max-w-4xl  '>
-          {toggleView ?
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
-              {document.tasks?.map((task, index) => (
-                <TaskCard
-                  updateTask={handleTaskUpdate}
-                  key={task.id || index}
-                  task={task}
-                />
-              ))}
-            </div>
-            : <Calendar weeklyPlan={document.weeklyPlan} />
-          }
+        <div className="w-full lg:mx-auto lg:max-w-4xl  ">
+          {toggleView
+            ? (
+                <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
+                  {document.tasks?.map((task, index) => (
+                    <TaskCard
+                      updateTask={handleTaskUpdate}
+                      key={task.id || index}
+                      task={task}
+                    />
+                  ))}
+                </div>
+              )
+            : <Calendar weeklyPlan={document.weeklyPlan} />}
         </div>
       </ToolLayout>
     </>

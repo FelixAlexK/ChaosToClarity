@@ -38,3 +38,10 @@ export const storageSchema = z.object({
     plan: responseSchema.shape.weeklyPlan,
   }),
 })
+
+export type StorageDocument = z.infer<typeof storageSchema>
+export type Task = z.infer<typeof storageSchema>['tasks'][number]
+export type WeeklyPlan = z.infer<typeof storageSchema>['weeklyPlan']
+export type Priority = z.infer<typeof taskSchema>['priority']
+
+export type Response = z.infer<typeof responseSchema>

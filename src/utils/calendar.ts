@@ -1,5 +1,4 @@
-import type { z } from 'zod'
-import type { monthDaySchema } from '@/types/calendar'
+import type { MonthDay } from '@/types/calendar'
 import { format, getDay, getDaysInMonth, subDays, subMonths } from 'date-fns'
 
 export const daysOfWeek = [
@@ -27,7 +26,7 @@ export function parseDateString(dateString: string): Date {
   return new Date(y, m - 1, d)
 }
 
-export function createDaysForCurrentMonth(year: number, month: number): z.infer<typeof monthDaySchema>[] {
+export function createDaysForCurrentMonth(year: number, month: number): MonthDay[] {
   return Array.from({ length: getNumberOfDaysInMonth(year, month) }, (_, index) => {
     const date = new Date(year, month - 1, index + 1)
     return {
@@ -40,7 +39,7 @@ export function createDaysForCurrentMonth(year: number, month: number): z.infer<
   })
 }
 
-export function createDaysForPreviousMonth(year: number, month: number, currentMonthDays: z.infer<typeof monthDaySchema>[]): z.infer<typeof monthDaySchema>[] {
+export function createDaysForPreviousMonth(year: number, month: number, currentMonthDays: MonthDay[]): MonthDay[] {
   const firstDayOfTheMonthWeekday = getWeekday(currentMonthDays[0].dateString)
   const previousMonth = subMonths(new Date(year, month - 1, 1), 1)
 
@@ -65,7 +64,7 @@ export function createDaysForPreviousMonth(year: number, month: number, currentM
   })
 }
 
-export function createDaysForNextMonth(year: number, month: number, currentMonthDays: z.infer<typeof monthDaySchema>[]): z.infer<typeof monthDaySchema>[] {
+export function createDaysForNextMonth(year: number, month: number, currentMonthDays: MonthDay[]): MonthDay[] {
   // use the actual last day date string from currentMonthDays (safer)
   const lastDayOfTheMonthWeekday = getWeekday(currentMonthDays[currentMonthDays.length - 1].dateString)
   // month is 1-based, so new Date(year, month, 1) gives next month's first day

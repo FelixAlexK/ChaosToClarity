@@ -1,5 +1,4 @@
-import type z from 'zod'
-import type { storageSchema, taskSchema } from '@/types/ai'
+import type { Priority, Task } from '@/types/ai'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
@@ -7,8 +6,6 @@ import { getCategoryHex, getCustomColor } from '@/utils/colors'
 import { Button } from './ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-
-type Task = z.infer<typeof storageSchema>['tasks'][number]
 
 interface TaskCardsProps {
   task: Task
@@ -76,7 +73,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
       {!isEditing && (
         <>
           <CardHeader>
-            <CardDescription className='uppercase text-stone-400 flex justify-between items-center'>
+            <CardDescription className="uppercase text-stone-400 flex justify-between items-center">
               {task.category}
               <Button
                 variant="link"
@@ -86,7 +83,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
                 Edit
               </Button>
             </CardDescription>
-            <CardTitle className='text-xl truncate'>{task.title}</CardTitle>
+            <CardTitle className="text-xl truncate">{task.title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <TaskCardDetail label="Priority" value={task.priority} />
@@ -114,7 +111,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
           </CardHeader>
           <CardContent className="space-y-2">
 
-            <Select onValueChange={value => setNewPriority(value as z.infer<typeof taskSchema>['priority'])}>
+            <Select onValueChange={value => setNewPriority(value as Priority)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder={task.priority} className="capitalize" />
               </SelectTrigger>
@@ -152,31 +149,33 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
         </>
       )}
 
-      {isEditing && <CardFooter className="flex flex-row">
-        <Button
-          variant="link"
-          className=""
-          onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-        >
-          {isEditing ? 'Save' : 'Edit'}
-        </Button>
-        <Button
-          variant="link"
-          className=""
-          onClick={() => handleCancel()}
-        >
-          {isEditing && 'Cancel'}
-        </Button>
-      </CardFooter>}
+      {isEditing && (
+        <CardFooter className="flex flex-row">
+          <Button
+            variant="link"
+            className=""
+            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+          >
+            {isEditing ? 'Save' : 'Edit'}
+          </Button>
+          <Button
+            variant="link"
+            className=""
+            onClick={() => handleCancel()}
+          >
+            {isEditing && 'Cancel'}
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   )
 }
 
-const TaskCardDetail = ({label, value}: {label: string, value: string}) => {
+function TaskCardDetail({ label, value}: { label: string, value: string }) {
   return (
-    <div className='flex flex-col gap-px'>
-      <small className='text-stone-400'>{label}</small>
-      <p className='font-semibold text-lg capitalize'>{value}</p> 
+    <div className="flex flex-col gap-px">
+      <small className="text-stone-400">{label}</small>
+      <p className="font-semibold text-lg capitalize">{value}</p>
     </div>
   )
 }
