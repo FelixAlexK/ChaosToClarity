@@ -15,8 +15,6 @@ function App() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-
-    
     const initSyncKit = async () => {
       try {
         await sync.init()
@@ -29,11 +27,9 @@ function App() {
     }
 
     if (!didInit) {
-
       initSyncKit()
       didInit = true
     }
-
   }, [])
 
   if (error) {

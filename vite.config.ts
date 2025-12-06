@@ -1,9 +1,10 @@
+import type { PluginOption } from 'vite'
 import path from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { defineConfig, type PluginOption } from 'vite'
+import { visualizer } from 'rollup-plugin-visualizer'
+import { defineConfig } from 'vite'
 import wasm from 'vite-plugin-wasm'
-import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -15,7 +16,7 @@ export default defineConfig({
       },
     }),
     tailwindcss(),
-    visualizer({ open: true }) as PluginOption
+    visualizer({ open: true }) as PluginOption,
   ],
 
   server: {
@@ -44,9 +45,9 @@ export default defineConfig({
             {
               test: /node_modules\/@google\/genai/,
               name: 'genai',
-            }
-          ]
-        }
+            },
+          ],
+        },
       },
     },
   },
