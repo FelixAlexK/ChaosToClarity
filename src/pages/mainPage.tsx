@@ -177,7 +177,7 @@ export function MainPage() {
     <>
       <header className="mb-4 lg:mb-8 ">
         <div className="flex flex-row w-full justify-between items-center lg:mx-auto lg:max-w-4xl">
-          <h1 className=" text-xl font-bold">Chaos to Clarity</h1>
+          <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">Chaos to Clarity</h1>
           <div className="flex gap-2 ">
             <Button variant="outline" onClick={() => setToggleView(!toggleView)}>{toggleView ? <Calendar1></Calendar1> : <Grid2X2></Grid2X2>}</Button>
             <ModeToggle />
