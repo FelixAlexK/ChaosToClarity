@@ -64,10 +64,10 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
 
   return (
     <Card
-      className="w-full"
+      className={`w-full`}
       style={{
-        backgroundColor: `${getCustomColor(color, 20)}`,
         border: `1px solid ${getCustomColor(color, 60)}`,
+        background: `linear-gradient(135deg, ${getCustomColor(color, 20)} 0%, ${getCustomColor(color, 10)} 100%)`,
       }}
     >
       {!isEditing && (
@@ -86,7 +86,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
             <CardTitle className="text-xl truncate">{task.title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <TaskCardDetail label="Priority" value={task.priority} />
+            <TaskCardDetail className="capitalize" label="Priority" value={task.priority} />
             <TaskCardDetail label="Estimated Time" value={task.estimated_time} />
             <TaskCardDetail label="Deadline" value={task.deadline ?? 'N/A'} />
           </CardContent>
@@ -153,14 +153,12 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
         <CardFooter className="flex flex-row">
           <Button
             variant="link"
-            className=""
             onClick={() => isEditing ? handleSave() : setIsEditing(true)}
           >
             {isEditing ? 'Save' : 'Edit'}
           </Button>
           <Button
             variant="link"
-            className=""
             onClick={() => handleCancel()}
           >
             {isEditing && 'Cancel'}
@@ -171,11 +169,11 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
   )
 }
 
-function TaskCardDetail({ label, value}: { label: string, value: string }) {
+function TaskCardDetail({ label, value, className }: { label: string, value: string, className?: string }) {
   return (
     <div className="flex flex-col gap-px">
-      <small className="text-stone-400">{label}</small>
-      <p className="font-semibold text-lg capitalize">{value}</p>
+      <small className={`text-sm leading-none font-medium text-muted-foreground`}>{label}</small>
+      <p className={`text-lg font-semibold ${className}`}>{value}</p>
     </div>
   )
 }

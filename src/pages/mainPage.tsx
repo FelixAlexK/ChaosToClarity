@@ -25,30 +25,45 @@ export function MainPage() {
   // Use SyncKit's React hook - this persists automatically
   const [document, { update: updateDocument }] = useSyncDocument<StorageDocument>(DOCUMENT_ID)
 
-  // Initialize document if it doesn't exist
+  const syncState = sync.getSyncState(DOCUMENT_ID)
+
   useEffect(() => {
-    if (!document && !hasInitialized.current) {
-      hasInitialized.current = true
-      updateDocument({
-        id: DOCUMENT_ID,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        tasks: [],
-        weeklyPlan: {
-          id: '',
-          plan: {
-            monday: [],
-            tuesday: [],
-            wednesday: [],
-            thursday: [],
-            friday: [],
-            saturday: [],
-            sunday: [],
-          },
-        },
-      })
+    if (!syncState)
+      return
+    if (syncState?.state === 'syncing') {
+      toast.loading('Syncing...')
     }
-  })
+    else if (syncState?.state === 'synced') {
+      toast.success('Synced!')
+    }
+    else if (syncState?.state === 'error') {
+      toast.error('Sync failed')
+    }
+  }, [syncState])
+
+  // Initialize document if it doesn't exist
+
+  if (!document && !hasInitialized.current) {
+    hasInitialized.current = true
+    updateDocument({
+      id: DOCUMENT_ID,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      tasks: [],
+      weeklyPlan: {
+        id: '',
+        plan: {
+          monday: [],
+          tuesday: [],
+          wednesday: [],
+          thursday: [],
+          friday: [],
+          saturday: [],
+          sunday: [],
+        },
+      },
+    })
+  }
 
   const handleBrainDumpSubmit = async (content: string) => {
     if (!document)
@@ -162,7 +177,7 @@ export function MainPage() {
     <>
       <header className="mb-4 lg:mb-8 ">
         <div className="flex flex-row w-full justify-between items-center lg:mx-auto lg:max-w-4xl">
-          <h1 className=" text-xl font-bold">Chaos to Clarity</h1>
+          <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">Chaos to Clarity</h1>
           <div className="flex gap-2 ">
             <Button variant="outline" onClick={() => setToggleView(!toggleView)}>{toggleView ? <Calendar1></Calendar1> : <Grid2X2></Grid2X2>}</Button>
             <ModeToggle />
