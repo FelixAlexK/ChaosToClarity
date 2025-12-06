@@ -76,27 +76,22 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
       {!isEditing && (
         <>
           <CardHeader>
-            <CardDescription>
+            <CardDescription className='uppercase text-stone-400 flex justify-between items-center'>
               {task.category}
+              <Button
+                variant="link"
+                className=""
+                onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+              >
+                Edit
+              </Button>
             </CardDescription>
-            <CardTitle>{task.title}</CardTitle>
+            <CardTitle className='text-xl truncate'>{task.title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <CardDescription>
-              Priority:
-              {' '}
-              {task.priority}
-            </CardDescription>
-            <CardDescription>
-              Estimated Time:
-              {' '}
-              {task.estimated_time}
-            </CardDescription>
-            <CardDescription>
-              Deadline:
-              {' '}
-              {task.deadline ?? 'N/A'}
-            </CardDescription>
+            <TaskCardDetail label="Priority" value={task.priority} />
+            <TaskCardDetail label="Estimated Time" value={task.estimated_time} />
+            <TaskCardDetail label="Deadline" value={task.deadline ?? 'N/A'} />
           </CardContent>
         </>
       )}
@@ -157,7 +152,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
         </>
       )}
 
-      <CardFooter className="flex flex-row">
+      {isEditing && <CardFooter className="flex flex-row">
         <Button
           variant="link"
           className=""
@@ -172,7 +167,16 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
         >
           {isEditing && 'Cancel'}
         </Button>
-      </CardFooter>
+      </CardFooter>}
     </Card>
+  )
+}
+
+const TaskCardDetail = ({label, value}: {label: string, value: string}) => {
+  return (
+    <div className='flex flex-col gap-px'>
+      <small className='text-stone-400'>{label}</small>
+      <p className='font-semibold text-lg capitalize'>{value}</p> 
+    </div>
   )
 }
