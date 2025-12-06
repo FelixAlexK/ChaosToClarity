@@ -8,11 +8,15 @@ const sync = new SyncKit({
   storage: 'indexeddb',
 })
 
+let didInit = false
+
 function App() {
   const [synckit, setSynckit] = useState<SyncKit | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+
+    
     const initSyncKit = async () => {
       try {
         await sync.init()
@@ -24,7 +28,12 @@ function App() {
       }
     }
 
-    initSyncKit()
+    if (!didInit) {
+
+      initSyncKit()
+      didInit = true
+    }
+
   }, [])
 
   if (error) {
@@ -33,7 +42,7 @@ function App() {
   }
 
   if (!synckit) {
-    toast.loading(`Syncing...`)
+    toast.loading(`Initializing...`)
     return
   }
 
