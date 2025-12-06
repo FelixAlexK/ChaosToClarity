@@ -25,30 +25,45 @@ export function MainPage() {
   // Use SyncKit's React hook - this persists automatically
   const [document, { update: updateDocument }] = useSyncDocument<StorageDocument>(DOCUMENT_ID)
 
-  // Initialize document if it doesn't exist
+  const syncState = sync.getSyncState(DOCUMENT_ID)
+
   useEffect(() => {
-    if (!document && !hasInitialized.current) {
-      hasInitialized.current = true
-      updateDocument({
-        id: DOCUMENT_ID,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        tasks: [],
-        weeklyPlan: {
-          id: '',
-          plan: {
-            monday: [],
-            tuesday: [],
-            wednesday: [],
-            thursday: [],
-            friday: [],
-            saturday: [],
-            sunday: [],
-          },
-        },
-      })
+    if (!syncState)
+      return
+    if (syncState?.state === 'syncing') {
+      toast.loading('Syncing...')
     }
-  })
+    else if (syncState?.state === 'synced') {
+      toast.success('Synced!')
+    }
+    else if (syncState?.state === 'error') {
+      toast.error('Sync failed')
+    }
+  }, [syncState])
+
+  // Initialize document if it doesn't exist
+
+  if (!document && !hasInitialized.current) {
+    hasInitialized.current = true
+    updateDocument({
+      id: DOCUMENT_ID,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      tasks: [],
+      weeklyPlan: {
+        id: '',
+        plan: {
+          monday: [],
+          tuesday: [],
+          wednesday: [],
+          thursday: [],
+          friday: [],
+          saturday: [],
+          sunday: [],
+        },
+      },
+    })
+  }
 
   const handleBrainDumpSubmit = async (content: string) => {
     if (!document)
