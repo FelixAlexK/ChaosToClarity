@@ -172,7 +172,7 @@ export function TaskCard({ task, updateTask }: TaskCardsProps) {
 function TaskCardDetail({ label, value, className }: { label: string, value: string, className?: string }) {
   return (
     <div className="flex flex-col gap-px">
-      <small className={`text-sm leading-none font-medium text-muted-foreground`}>{label}</small>
+      <small className="text-sm leading-none font-medium text-muted-foreground">{label}</small>
       <p className={`text-lg font-semibold ${className}`}>{value}</p>
     </div>
   )

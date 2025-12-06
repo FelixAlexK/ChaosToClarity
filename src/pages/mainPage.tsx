@@ -30,40 +30,27 @@ export function MainPage() {
   useEffect(() => {
     if (!syncState)
       return
-    if (syncState?.state === 'syncing') {
+
+    toast.dismiss()
+    if (syncState.state === 'syncing') {
       toast.loading('Syncing...')
     }
-    else if (syncState?.state === 'synced') {
+    else if (syncState.state === 'synced') {
       toast.success('Synced!')
     }
-    else if (syncState?.state === 'error') {
+    else if (syncState.state === 'error') {
       toast.error('Sync failed')
     }
   }, [syncState])
 
   // Initialize document if it doesn't exist
-
-  if (!document && !hasInitialized.current) {
-    hasInitialized.current = true
-    updateDocument({
-      id: DOCUMENT_ID,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      tasks: [],
-      weeklyPlan: {
-        id: '',
-        plan: {
-          monday: [],
-          tuesday: [],
-          wednesday: [],
-          thursday: [],
-          friday: [],
-          saturday: [],
-          sunday: [],
-        },
-      },
-    })
-  }
+  useEffect(() => {
+    if (!syncState)
+      return
+    if (syncState?.state === 'syncing') {
+      toast.loading('Syncing...')
+    }
+  }, [])
 
   const handleBrainDumpSubmit = async (content: string) => {
     if (!document)
