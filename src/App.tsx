@@ -1,7 +1,8 @@
 import { SyncKit, SyncProvider } from '@synckit-js/sdk'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import ChaosToClarityApp from './components/ChaosToClarityApp'
+import { BaseLayout } from './layouts/baseLayout'
+import { MainPage } from './pages/mainPage'
 
 const sync = new SyncKit({
   storage: 'indexeddb',
@@ -39,8 +40,9 @@ function App() {
   return (
     <SyncProvider synckit={synckit}>
 
-      <ChaosToClarityApp></ChaosToClarityApp>
-      {/* <Toaster position="top-center" /> */}
+      <BaseLayout>
+        <MainPage />
+      </BaseLayout>
 
     </SyncProvider>
 
