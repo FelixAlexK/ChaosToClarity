@@ -19,8 +19,7 @@ export function MainPage() {
   const [error, setError] = useState<string | null>(null)
   const [toggleView, setToggleView] = useState(true)
   const hasInitialized = useRef(false)
-
-  const sync = useSyncKit()
+  const sync = useRef(useSyncKit()).current
 
   // Use SyncKit's React hook - this persists automatically
   const [document, { update: updateDocument }] = useSyncDocument<StorageDocument>(DOCUMENT_ID)
@@ -30,28 +29,29 @@ export function MainPage() {
   useEffect(() => {
     if (!syncState)
       return
-    if (syncState?.state === 'syncing') {
+
+    toast.dismiss()
+    if (syncState.state === 'syncing') {
       toast.loading('Syncing...')
     }
-    else if (syncState?.state === 'synced') {
+    else if (syncState.state === 'synced') {
       toast.success('Synced!')
     }
-    else if (syncState?.state === 'error') {
+    else if (syncState.state === 'error') {
       toast.error('Sync failed')
     }
   }, [syncState])
 
   // Initialize document if it doesn't exist
+  useEffect(() => {
+    if (hasInitialized.current || document)
+      return
 
-  if (!document && !hasInitialized.current) {
-    hasInitialized.current = true
     updateDocument({
-      id: DOCUMENT_ID,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      id: crypto.randomUUID(),
       tasks: [],
       weeklyPlan: {
-        id: '',
+        id: crypto.randomUUID(),
         plan: {
           monday: [],
           tuesday: [],
@@ -62,8 +62,12 @@ export function MainPage() {
           sunday: [],
         },
       },
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     })
-  }
+    hasInitialized.current = true
+    toast.info('Initialized new document')
+    }, [])
 
   const handleBrainDumpSubmit = async (content: string) => {
     if (!document)
@@ -158,9 +162,61 @@ export function MainPage() {
     if (!document)
       return
 
-    await sync.clearAll()
+    updateDocument({
+      ...document,
+      tasks: [],
+      weeklyPlan: {
+        id: crypto.randomUUID(),
+        plan: {
+          monday: [],
+          tuesday: [],
+          wednesday: [],
+          thursday: [],
+          friday: [],
+          saturday: [],
+          sunday: [],
+        },
+      },  
+      updatedAt: Date.now(),
+    })
 
     toast.info('All data cleared.')
+  }
+
+  const handleTaskDelete = async (id: string) => {
+    if (!document) {
+      setError('Document not loaded')
+      return
+    }
+
+    const taskToDelete = document.tasks.find(t => t.id === id)
+    if (!taskToDelete) {
+      setError('Task not found')
+      return
+    }
+
+    const updatedTasks = document.tasks.filter(t => t.id !== id)
+    const originalPlan = document.weeklyPlan?.plan || {}
+    const updatedWeeklyPlan: typeof originalPlan = { ...originalPlan }
+
+    // Remove task from weekly plan if it exists there
+    for (const [day, tasks] of Object.entries(updatedWeeklyPlan)) {
+      updatedWeeklyPlan[day as keyof typeof updatedWeeklyPlan] = tasks.filter(task => task.task !== taskToDelete.title || task.end !== taskToDelete.deadline)
+    }
+
+    updateDocument(
+      {
+        ...document,
+        tasks: updatedTasks,
+        weeklyPlan: {
+          ...document.weeklyPlan,
+          plan: updatedWeeklyPlan,
+        },
+        updatedAt: Date.now(),
+      },
+    )
+
+    toast.success('Task deleted!')
   }
 
   // Show loading state while document initializes
@@ -197,6 +253,7 @@ export function MainPage() {
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
                   {document.tasks?.map((task, index) => (
                     <TaskCard
+                      deleteTask={handleTaskDelete}
                       updateTask={handleTaskUpdate}
                       key={task.id || index}
                       task={task}

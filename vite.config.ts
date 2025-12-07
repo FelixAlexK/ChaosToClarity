@@ -16,7 +16,7 @@ export default defineConfig({
       },
     }),
     tailwindcss(),
-    visualizer({ open: true }) as PluginOption,
+    visualizer({ open: process.env.NODE_ENV === 'development' }) as PluginOption,
   ],
 
   server: {
