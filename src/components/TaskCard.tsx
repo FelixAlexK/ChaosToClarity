@@ -63,7 +63,7 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
     }
   })
 
-  if(markedAsDone) {
+  if(markedAsDone && !isEditing) {
     return <TaskCardDelete deleteTask={deleteTask} markedAsDone={() => setMarkedAsDone(false)} task={task} />
   }
 
