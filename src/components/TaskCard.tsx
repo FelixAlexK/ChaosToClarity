@@ -63,11 +63,7 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
     }
   })
 
-<<<<<<< HEAD
   if(markedAsDone && !isEditing) {
-=======
-  if(markedAsDone) {
->>>>>>> main
     return <TaskCardDelete deleteTask={deleteTask} markedAsDone={() => setMarkedAsDone(false)} task={task} />
   }
 
@@ -191,11 +187,8 @@ function TaskCardDetail({ label, value, className }: { label: string, value: str
 }
 
 function TaskCardDelete({ task, markedAsDone, deleteTask }: { task: Task, markedAsDone: () => void, deleteTask: (id: string) => void }) {
-<<<<<<< HEAD
-=======
 
 
->>>>>>> main
   return (
     <Card onClick={markedAsDone} className='bg-muted-foreground/20 border-muted-foreground/60'>
       <CardHeader>
