@@ -67,7 +67,7 @@ export function MainPage() {
     })
     hasInitialized.current = true
     toast.info('Initialized new document')
-    }, [])
+  }, [])
 
   const handleBrainDumpSubmit = async (content: string) => {
     if (!document)
@@ -176,7 +176,7 @@ export function MainPage() {
           saturday: [],
           sunday: [],
         },
-      },  
+      },
       updatedAt: Date.now(),
     })
 
