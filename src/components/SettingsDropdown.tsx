@@ -1,4 +1,4 @@
-import { Settings, Trash } from 'lucide-react'
+import { Settings } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
