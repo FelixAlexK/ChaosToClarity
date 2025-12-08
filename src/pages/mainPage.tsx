@@ -219,6 +219,27 @@ export function MainPage() {
     toast.success('Task deleted!')
   }
 
+  const deleteAllDoneTasks = () => {
+    if (!document) {
+      setError('Document not loaded')
+    }
+
+    const updatedTasks = document.tasks.filter(task => !task.completed)
+
+    if (updatedTasks.length === document.tasks.length) {
+      toast.info('No done tasks to delete')
+      return
+    }
+
+    updateDocument({
+      ...document,
+      tasks: updatedTasks,
+      updatedAt: Date.now(),
+    })
+
+    toast.success('All done tasks deleted!')
+  }
+
   // Show loading state while document initializes
   if (!document) {
     toast.loading('Syncing data...')
@@ -237,7 +258,7 @@ export function MainPage() {
           <div className="flex gap-2 ">
             <Button variant="outline" onClick={() => setToggleView(!toggleView)}>{toggleView ? <Calendar1></Calendar1> : <Grid2X2></Grid2X2>}</Button>
             <ModeToggle />
-            <SettingsDropdown clearAllData={handleClearAllData}></SettingsDropdown>
+            <SettingsDropdown deleteAllDoneTasks={deleteAllDoneTasks} clearAllData={handleClearAllData}></SettingsDropdown>
           </div>
         </div>
       </header>
