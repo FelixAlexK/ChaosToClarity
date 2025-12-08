@@ -32,7 +32,7 @@ export const storageSchema = z.object({
   id: z.uuid(),
   createdAt: z.coerce.number(),
   updatedAt: z.coerce.number(),
-  tasks: z.array(responseSchema.shape.tasks.element.extend({ id: z.uuid(), color: z.string().optional() })),
+  tasks: z.array(responseSchema.shape.tasks.element.extend({ id: z.uuid(), color: z.string().optional(), completed: z.boolean().optional() })),
   weeklyPlan: z.object({
     id: z.uuid(),
     plan: responseSchema.shape.weeklyPlan,

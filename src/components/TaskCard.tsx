@@ -63,14 +63,21 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
     }
   })
 
-  if(markedAsDone && !isEditing) {
-    return <TaskCardDelete deleteTask={deleteTask} markedAsDone={() => setMarkedAsDone(false)} task={task} />
+  const handleMarkTaskAsDone = (isCompleted: boolean) => {
+    updateTask({
+      id: task.id,
+      completed: isCompleted,
+    })
+  }
+
+  if (task.completed && !isEditing) {
+    return <TaskCardDelete deleteTask={deleteTask} markedAsDone={() => handleMarkTaskAsDone(false)} task={task} />
   }
 
   return (
     <Card
-      onClick={() => setMarkedAsDone(!markedAsDone)}
-      className={`w-full` + (markedAsDone ? '' : '')}
+      onClick={() => handleMarkTaskAsDone(!task.completed)}
+      className="w-full"
       style={{
         border: `1px solid ${getCustomColor(color, 60)}`,
         background: `linear-gradient(135deg, ${getCustomColor(color, 20)} 0%, ${getCustomColor(color, 10)} 100%)`,
@@ -81,7 +88,7 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
           <CardHeader>
             <CardDescription className="uppercase text-stone-400 flex justify-between items-center">
               {task.category}
-               <Button
+              <Button
                 variant="link"
                 className=""
 
@@ -89,7 +96,7 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
               >
                 Edit
               </Button>
-              
+
             </CardDescription>
             <CardTitle className="text-xl truncate">{task.title}</CardTitle>
           </CardHeader>
@@ -187,14 +194,12 @@ function TaskCardDetail({ label, value, className }: { label: string, value: str
 }
 
 function TaskCardDelete({ task, markedAsDone, deleteTask }: { task: Task, markedAsDone: () => void, deleteTask: (id: string) => void }) {
-
-
   return (
-    <Card onClick={markedAsDone} className='bg-muted-foreground/20 border-muted-foreground/60'>
+    <Card onClick={markedAsDone} className="bg-muted-foreground/20 border-muted-foreground/60">
       <CardHeader>
         <CardDescription className="uppercase text-muted-foreground flex justify-between items-center">
           {task.category}
-           <Button
+          <Button
             variant="destructive"
             className="text-white"
             onClick={() => deleteTask(task.id)}
