@@ -22,7 +22,6 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
   const [newDeadline, setNewDeadline] = useState(task.deadline)
   const [color, setColor] = useState(task.color ?? (() => getCustomColor(getCategoryHex(task.category), 100))())
   const [currentColor, setCurrentColor] = useState(color)
-  const [markedAsDone, setMarkedAsDone] = useState(false)
 
   const handleSave = () => {
     updateTask({
