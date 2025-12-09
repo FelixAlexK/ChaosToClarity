@@ -1,4 +1,4 @@
-import type { StorageDocument, Task } from '@/types/ai'
+import type { StorageDocumentV2, TaskV2 } from '@/types/ai_v2'
 import { useSyncDocument, useSyncKit } from '@synckit-js/sdk'
 import { Calendar1, Grid2X2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -22,7 +22,7 @@ export function MainPage() {
   const sync = useRef(useSyncKit()).current
 
   // Use SyncKit's React hook - this persists automatically
-  const [document, { update: updateDocument }] = useSyncDocument<StorageDocument>(DOCUMENT_ID)
+  const [document, { update: updateDocument }] = useSyncDocument<StorageDocumentV2>(DOCUMENT_ID)
 
   const syncState = sync.getSyncState(DOCUMENT_ID)
 
@@ -83,6 +83,8 @@ export function MainPage() {
       const newTasks = response.tasks.map(task => ({
         ...task,
         id: crypto.randomUUID(),
+        color: undefined,
+        completed: false,
       }))
 
       // Merge weekly plan by appending to each day
@@ -118,7 +120,7 @@ export function MainPage() {
     }
   }
 
-  const handleTaskUpdate = (task: Partial<Task>) => {
+  const handleTaskUpdate = (task: Partial<TaskV2>) => {
     if (!document) {
       setError('Document not loaded')
       return
