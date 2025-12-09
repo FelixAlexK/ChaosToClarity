@@ -1,4 +1,4 @@
-import type { Priority, Task } from '@/types/ai'
+import type { PriorityV2, TaskV2 } from '@/types/ai_v2'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
@@ -8,8 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 interface TaskCardsProps {
-  task: Task
-  updateTask: (updatedTask: Partial<Task>) => void
+  task: TaskV2
+  updateTask: (updatedTask: Partial<TaskV2>) => void
   deleteTask: (id: string) => void
 }
 
@@ -75,7 +75,6 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
 
   return (
     <Card
-      onClick={() => handleMarkTaskAsDone(!task.completed)}
       className="w-full"
       style={{
         border: `1px solid ${getCustomColor(color, 60)}`,
@@ -125,7 +124,7 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
           </CardHeader>
           <CardContent className="space-y-2">
 
-            <Select onValueChange={value => setNewPriority(value as Priority)}>
+            <Select onValueChange={value => setNewPriority(value as PriorityV2)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder={task.priority} className="capitalize" />
               </SelectTrigger>
@@ -192,7 +191,7 @@ function TaskCardDetail({ label, value, className }: { label: string, value: str
   )
 }
 
-function TaskCardDelete({ task, markedAsDone, deleteTask }: { task: Task, markedAsDone: () => void, deleteTask: (id: string) => void }) {
+function TaskCardDelete({ task, markedAsDone, deleteTask }: { task: TaskV2, markedAsDone: () => void, deleteTask: (id: string) => void }) {
   return (
     <Card onClick={markedAsDone} className="bg-muted-foreground/20 border-muted-foreground/60">
       <CardHeader>
@@ -201,7 +200,7 @@ function TaskCardDelete({ task, markedAsDone, deleteTask }: { task: Task, marked
           <Button
             variant="destructive"
             className="text-white"
-            onClick={() => deleteTask(task.id)}
+            onClick={() => deleteTask(task.id!)}
           >
             Delete
           </Button>
