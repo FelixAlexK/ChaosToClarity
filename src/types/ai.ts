@@ -11,9 +11,11 @@ export const taskSchema = z.object({
 
 export const daySchema = z.object({
   task: z.string().describe('Task for the day.'),
-  start: z.string().describe('Start date for the task. If not specified, use the given current date.'),
-  end: z.string().describe('Deadline for the task.'),
+  start: z.string().describe('Start date and time for the task. If not specified, use the given current date and time.'),
+  end: z.string().describe('Deadline date and time for the task.'),
 })
+
+
 
 export const responseSchema = z.object({
   tasks: z.array(taskSchema).describe('A list of organized tasks.'),
