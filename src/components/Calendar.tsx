@@ -29,7 +29,7 @@ const localizer = dateFnsLocalizer({
 })
 
 export function Calendar({ weeklyPlan }: CalendarProps) {
-  const [date, setDate] = useState<Date>(new Date())
+  const [date, setDate] = useState<Date>(() => new Date())
   const [view, setView] = useState(Views.WEEK)
 
   const events = useMemo(() => {
@@ -45,7 +45,6 @@ export function Calendar({ weeklyPlan }: CalendarProps) {
           title: task.task,
           start: new Date(task.start),
           end: new Date(task.end),
-          allDay: true,
         })
       })
     }
