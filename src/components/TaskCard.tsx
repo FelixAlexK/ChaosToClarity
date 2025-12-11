@@ -1,6 +1,5 @@
 import type { PriorityV2, TaskV2 } from '@/types/ai_v2'
 import { useState } from 'react'
-import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { getCategoryHex, getCustomColor } from '@/utils/colors'
 import { Button } from './ui/button'
@@ -22,6 +21,7 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
   const [newDeadline, setNewDeadline] = useState(task.deadline)
   const [color, setColor] = useState(task.color ?? (() => getCustomColor(getCategoryHex(task.category), 100))())
   const [currentColor, setCurrentColor] = useState(color)
+  const [completed, setCompleted] = useState(task.completed ?? false)
 
   const handleSave = () => {
     updateTask({
@@ -42,39 +42,21 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
     setIsEditing(false)
   }
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isEditing) {
-      setIsEditing(false)
-      // Reset fields to original values
-      setNewTitle(task.title)
-      setNewCategory(task.category)
-      setNewPriority(task.priority)
-      setNewEstimatedTime(task.estimated_time)
-      setNewDeadline(task.deadline)
-
-      toast.info('Edit cancelled')
-      e.preventDefault()
-    }
-
-    if (e.key === 'Enter' && isEditing) {
-      handleSave()
-      e.preventDefault()
-    }
-  })
-
   const handleMarkTaskAsDone = (isCompleted: boolean) => {
+    setCompleted(isCompleted)
     updateTask({
       id: task.id,
       completed: isCompleted,
     })
   }
 
-  if (task.completed && !isEditing) {
-    return <TaskCardDelete deleteTask={deleteTask} markedAsDone={() => handleMarkTaskAsDone(false)} task={task} />
+  if (completed && !isEditing) {
+    return <TaskCardDelete deleteTask={deleteTask} markedAsDone={() => handleMarkTaskAsDone(!completed)} task={task} />
   }
 
   return (
     <Card
+      onClick={() => setCompleted(!completed)}
       className="w-full"
       style={{
         border: `1px solid ${getCustomColor(color, 60)}`,
