@@ -1,6 +1,5 @@
-import type { Priority, Task } from '@/types/ai'
+import type { PriorityV2, TaskV2 } from '@/types/ai_v2'
 import { useState } from 'react'
-import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { getCategoryHex, getCustomColor } from '@/utils/colors'
 import { Button } from './ui/button'
@@ -8,8 +7,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 interface TaskCardsProps {
-  task: Task
-  updateTask: (updatedTask: Partial<Task>) => void
+  task: TaskV2
+  updateTask: (updatedTask: Partial<TaskV2>) => void
   deleteTask: (id: string) => void
 }
 
@@ -22,6 +21,7 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
   const [newDeadline, setNewDeadline] = useState(task.deadline)
   const [color, setColor] = useState(task.color ?? (() => getCustomColor(getCategoryHex(task.category), 100))())
   const [currentColor, setCurrentColor] = useState(color)
+  const [completed, setCompleted] = useState(task.completed ?? false)
 
   const handleSave = () => {
     updateTask({
@@ -42,40 +42,21 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
     setIsEditing(false)
   }
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isEditing) {
-      setIsEditing(false)
-      // Reset fields to original values
-      setNewTitle(task.title)
-      setNewCategory(task.category)
-      setNewPriority(task.priority)
-      setNewEstimatedTime(task.estimated_time)
-      setNewDeadline(task.deadline)
-
-      toast.info('Edit cancelled')
-      e.preventDefault()
-    }
-
-    if (e.key === 'Enter' && isEditing) {
-      handleSave()
-      e.preventDefault()
-    }
-  })
-
   const handleMarkTaskAsDone = (isCompleted: boolean) => {
+    setCompleted(isCompleted)
     updateTask({
       id: task.id,
       completed: isCompleted,
     })
   }
 
-  if (task.completed && !isEditing) {
-    return <TaskCardDelete deleteTask={deleteTask} markedAsDone={() => handleMarkTaskAsDone(false)} task={task} />
+  if (completed && !isEditing) {
+    return <TaskCardDelete deleteTask={deleteTask} markedAsDone={() => handleMarkTaskAsDone(!completed)} task={task} />
   }
 
   return (
     <Card
-      onClick={() => handleMarkTaskAsDone(!task.completed)}
+      onClick={() => setCompleted(!completed)}
       className="w-full"
       style={{
         border: `1px solid ${getCustomColor(color, 60)}`,
@@ -125,7 +106,7 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
           </CardHeader>
           <CardContent className="space-y-2">
 
-            <Select onValueChange={value => setNewPriority(value as Priority)}>
+            <Select onValueChange={value => setNewPriority(value as PriorityV2)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder={task.priority} className="capitalize" />
               </SelectTrigger>
@@ -192,7 +173,7 @@ function TaskCardDetail({ label, value, className }: { label: string, value: str
   )
 }
 
-function TaskCardDelete({ task, markedAsDone, deleteTask }: { task: Task, markedAsDone: () => void, deleteTask: (id: string) => void }) {
+function TaskCardDelete({ task, markedAsDone, deleteTask }: { task: TaskV2, markedAsDone: () => void, deleteTask: (id: string) => void }) {
   return (
     <Card onClick={markedAsDone} className="bg-muted-foreground/20 border-muted-foreground/60">
       <CardHeader>
@@ -201,7 +182,7 @@ function TaskCardDelete({ task, markedAsDone, deleteTask }: { task: Task, marked
           <Button
             variant="destructive"
             className="text-white"
-            onClick={() => deleteTask(task.id)}
+            onClick={() => deleteTask(task.id!)}
           >
             Delete
           </Button>
