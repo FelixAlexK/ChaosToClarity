@@ -23,7 +23,7 @@ export interface UseTaskManagementHandlerProps extends UseSyncKitProps {
     setIsProcessing: SetProcessing
 }
 
-export function useInitSyncKit({ setError, setMessage }: UseSyncKitProps) {
+export function initSyncKit({ setError, setMessage }: UseSyncKitProps) {
     const [synckit, setSynckit] = useState<SyncKit | null>(null)
     const isMounted = useRef(true)
 
@@ -65,7 +65,7 @@ export function useInitSyncKit({ setError, setMessage }: UseSyncKitProps) {
     return { synckit }
 }
 
-export function useSyncKitDocument({ setMessage }: UseSyncKitProps) {
+export function syncKitDocument({ setMessage }: UseSyncKitProps) {
     const hasInitialized = useRef(false)
     const [document, { update: updateDocument }] = useSyncDocument<StorageDocumentV2>(DOCUMENT_ID)
 
@@ -100,7 +100,7 @@ export function useSyncKitDocument({ setMessage }: UseSyncKitProps) {
     return { document, updateDocument }
 }
 
-export function useTaskManagementHandlers({ document, updateDocument, setIsProcessing, setError, setMessage }: UseTaskManagementHandlerProps) {
+export function taskManagementHandlers({ document, updateDocument, setIsProcessing, setError, setMessage }: UseTaskManagementHandlerProps) {
     const handleBrainDumpSubmit = async (content: string) => {
         if (!document)
             return
