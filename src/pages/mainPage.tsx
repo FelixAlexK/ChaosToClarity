@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { Calendar } from '@/components/Calendar'
 import { TaskCard } from '@/components/TaskCard'
 import { Button } from '@/components/ui/button'
-import { useSyncKitDocument, useTaskManagementHandlers } from '@/hooks/useSyncKit'
+import { syncKitDocument, taskManagementHandlers } from '@/hooks/useSyncKit'
 import { ToolLayout } from '@/layouts/toolLayout'
 import { BrainDumpInput } from '../components/BrainDumpInput'
 import { ModeToggle } from '../components/ModeToggle'
@@ -16,7 +16,7 @@ export function MainPage() {
   const [error, setError] = useState<string | null>(null)
   const [toggleView, setToggleView] = useState(true)
   const [message, setMessage] = useState<{ message: string, type: Exclude<ToastT['type'], 'error'> } | null>(null)
-  const { document, updateDocument } = useSyncKitDocument({ setError, setMessage })
+  const { document, updateDocument } = syncKitDocument({ setError, setMessage })
 
   const {
     handleBrainDumpSubmit,
@@ -24,7 +24,7 @@ export function MainPage() {
     handleClearAllData,
     handleTaskDelete,
     deleteAllDoneTasks,
-  } = useTaskManagementHandlers({ document, updateDocument, setIsProcessing, setError, setMessage })
+  } = taskManagementHandlers({ document, updateDocument, setIsProcessing, setError, setMessage })
 
   useEffect(() => {
     if (!message) {
