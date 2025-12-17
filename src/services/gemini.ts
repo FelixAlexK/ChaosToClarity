@@ -7,8 +7,8 @@ import { responseSchemaV2 } from '@/types/ai_v2'
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GOOGLE_API_KEY })
 const model = 'gemini-2.5-flash'
 
-type GeminiTextResponse = { text?: string }
-type PayloadSummary = { model: string; contentLength: number; date: string }
+interface GeminiTextResponse { text?: string }
+interface PayloadSummary { model: string, contentLength: number, date: string }
 
 async function generate(content: string, date: string) {
   return ai.models.generateContent({
@@ -49,7 +49,8 @@ function parseJson(text: string, summary: PayloadSummary) {
 
 function validateResponse(json: unknown) {
   const parsed = responseSchemaV2.safeParse(json)
-  if (parsed.success) return parsed.data
+  if (parsed.success)
+    return parsed.data
 
   let errorDetails = ''
   try {

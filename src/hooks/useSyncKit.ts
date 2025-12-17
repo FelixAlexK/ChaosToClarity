@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
-import { SyncKit, useSyncDocument } from '@synckit-js/sdk'
-import type { StorageDocumentV2, TaskV2 } from '@/types/ai_v2'
-import { sendBrainDumpToGemini } from '@/services/gemini'
+import type { Dispatch, SetStateAction } from 'react'
 import type { ToastT } from 'sonner'
+import type { StorageDocumentV2, TaskV2 } from '@/types/ai_v2'
+import { SyncKit, useSyncDocument } from '@synckit-js/sdk'
+import { useEffect, useRef, useState } from 'react'
+import { sendBrainDumpToGemini } from '@/services/gemini'
 
 const DOCUMENT_ID = import.meta.env.VITE_DOCUMENT_ID as string || 'ctc-id'
 
-type StatusMessage = { message: string; type: Exclude<ToastT['type'], 'error'> } | null
+type StatusMessage = { message: string, type: Exclude<ToastT['type'], 'error'> } | null
 type SetMessage = Dispatch<SetStateAction<StatusMessage>>
 type SetError = Dispatch<SetStateAction<string | null>>
 type SetProcessing = Dispatch<SetStateAction<boolean>>
@@ -21,7 +22,6 @@ export interface UseTaskManagementHandlerProps extends UseSyncKitProps {
     updateDocument: (doc: Partial<StorageDocumentV2>) => void
     setIsProcessing: SetProcessing
 }
-
 
 export function useInitSyncKit({ setError, setMessage }: UseSyncKitProps) {
     const [synckit, setSynckit] = useState<SyncKit | null>(null)
@@ -39,10 +39,10 @@ export function useInitSyncKit({ setError, setMessage }: UseSyncKitProps) {
                 }
 
                 if (sync.isInitialized() || synckit?.isInitialized()) {
-
                     setMessage({ message: 'SyncKit initialized successfully', type: 'success' })
                 }
-            } catch (err) {
+            }
+            catch (err) {
                 console.error('Failed to initialize SyncKit:', err)
                 setError('Failed to initialize SyncKit')
                 if (isMounted.current) {
@@ -65,14 +65,14 @@ export function useInitSyncKit({ setError, setMessage }: UseSyncKitProps) {
     return { synckit }
 }
 
-
-export function useSyncKitDocument({ setError, setMessage }: UseSyncKitProps) {
+export function useSyncKitDocument({ setMessage }: UseSyncKitProps) {
     const hasInitialized = useRef(false)
     const [document, { update: updateDocument }] = useSyncDocument<StorageDocumentV2>(DOCUMENT_ID)
 
     // Initialize document if it doesn't exist (only once)
     useEffect(() => {
-        if (hasInitialized.current) return
+        if (hasInitialized.current)
+            return
         if (!document) {
             updateDocument({
                 id: crypto.randomUUID(),
@@ -102,7 +102,8 @@ export function useSyncKitDocument({ setError, setMessage }: UseSyncKitProps) {
 
 export function useTaskManagementHandlers({ document, updateDocument, setIsProcessing, setError, setMessage }: UseTaskManagementHandlerProps) {
     const handleBrainDumpSubmit = async (content: string) => {
-        if (!document) return
+        if (!document)
+            return
         try {
             setIsProcessing(true)
             const response = await sendBrainDumpToGemini(content)
@@ -130,13 +131,16 @@ export function useTaskManagementHandlers({ document, updateDocument, setIsProce
                 updatedAt: Date.now(),
             })
             setMessage({
-                message: 'Brain dump processed!', type: 'success'
+                message: 'Brain dump processed!',
+                type: 'success',
             })
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error processing brain dump:', error)
             const errorMessage = error instanceof Error ? error.message : 'Unknown error'
             setError(errorMessage)
-        } finally {
+        }
+        finally {
             setIsProcessing(false)
         }
     }
@@ -172,7 +176,8 @@ export function useTaskManagementHandlers({ document, updateDocument, setIsProce
     }
 
     const handleClearAllData = async () => {
-        if (!document) return
+        if (!document)
+            return
         updateDocument({
             ...document,
             tasks: [],

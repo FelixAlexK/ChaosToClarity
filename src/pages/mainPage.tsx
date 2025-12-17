@@ -1,25 +1,22 @@
-import type { TaskV2 } from '@/types/ai_v2'
+import type { ToastT } from 'sonner'
 import { Calendar1, Grid2X2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { toast, type ToasterProps, type ToastT } from 'sonner'
+import { toast } from 'sonner'
 import { Calendar } from '@/components/Calendar'
 import { TaskCard } from '@/components/TaskCard'
 import { Button } from '@/components/ui/button'
+import { useSyncKitDocument, useTaskManagementHandlers } from '@/hooks/useSyncKit'
 import { ToolLayout } from '@/layouts/toolLayout'
 import { BrainDumpInput } from '../components/BrainDumpInput'
 import { ModeToggle } from '../components/ModeToggle'
 import { SettingsDropdown } from '../components/SettingsDropdown'
-import { useSyncKitDocument, useTaskManagementHandlers } from '@/hooks/useSyncKit'
-
-
 
 export function MainPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toggleView, setToggleView] = useState(true)
   const [message, setMessage] = useState<{ message: string, type: Exclude<ToastT['type'], 'error'> } | null>(null)
-  const { document, updateDocument } = useSyncKitDocument({setError, setMessage})
-
+  const { document, updateDocument } = useSyncKitDocument({ setError, setMessage })
 
   const {
     handleBrainDumpSubmit,
@@ -28,18 +25,20 @@ export function MainPage() {
     handleTaskDelete,
     deleteAllDoneTasks,
   } = useTaskManagementHandlers({ document, updateDocument, setIsProcessing, setError, setMessage })
-  
+
   useEffect(() => {
-    if (!message) { return }
+    if (!message) {
+      return
+    }
 
     const { message: msg, type } = message
 
-    if(type === 'success') {
-      toast.success(msg )
-    } else {
+    if (type === 'success') {
+      toast.success(msg)
+    }
+    else {
       toast.info(msg)
     }
-    setMessage(null)
   }, [message])
 
   // Show loading state while document initializes

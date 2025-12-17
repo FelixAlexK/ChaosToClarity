@@ -1,14 +1,14 @@
+import type { ToastT } from 'sonner'
 import { SyncProvider } from '@synckit-js/sdk'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { useInitSyncKit } from './hooks/useSyncKit'
-import { toast, type ToastT } from 'sonner'
 import { BaseLayout } from './layouts/baseLayout'
 import { MainPage } from './pages/mainPage'
-import { useState } from 'react'
-
 
 function App() {
   const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<{ message: string, type: Omit<ToastT['type'], 'error'> } | null>(null)
+  const [message, setMessage] = useState<{ message: string, type: Exclude<ToastT['type'], 'error'> } | null>(null)
   const { synckit } = useInitSyncKit({ setError, setMessage })
 
   if (error) {
