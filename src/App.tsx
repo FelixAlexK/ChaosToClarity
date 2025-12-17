@@ -1,56 +1,32 @@
-import { SyncKit, SyncProvider } from '@synckit-js/sdk'
-import { useEffect, useState } from 'react'
+import type { ToastT } from 'sonner'
+import { SyncProvider } from '@synckit-js/sdk'
+import { useState } from 'react'
 import { toast } from 'sonner'
+import { initSyncKit } from './hooks/useSyncKit'
 import { BaseLayout } from './layouts/baseLayout'
 import { MainPage } from './pages/mainPage'
 
-const sync = new SyncKit({
-  storage: 'indexeddb',
-})
-
-let didInit = false
-
 function App() {
-  const [synckit, setSynckit] = useState<SyncKit | null>(null)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const initSyncKit = async () => {
-      try {
-        await sync.init()
-        setSynckit(sync)
-      }
-      catch (err) {
-        console.error('Failed to initialize SyncKit:', err)
-        setError(err instanceof Error ? err.message : 'Unknown error')
-      }
-    }
-
-    if (!didInit) {
-      initSyncKit()
-      didInit = true
-    }
-  }, [])
+  const [message, setMessage] = useState<{ message: string, type: Exclude<ToastT['type'], 'error'> } | null>(null)
+  const { synckit } = initSyncKit({ setError, setMessage })
 
   if (error) {
     toast.error(`Failed to initialize SyncKit: ${error}`)
-    return
+    return null
   }
 
   if (!synckit) {
-    toast.loading(`Initializing...`)
-    return
+    toast.loading(`${message ? message.message : 'Initializing SyncKit...'}`)
+    return null
   }
 
   return (
     <SyncProvider synckit={synckit}>
-
       <BaseLayout>
         <MainPage />
       </BaseLayout>
-
     </SyncProvider>
-
   )
 }
 
