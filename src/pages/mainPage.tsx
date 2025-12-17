@@ -1,246 +1,46 @@
-import type { StorageDocumentV2, TaskV2 } from '@/types/ai_v2'
-import { useSyncDocument, useSyncKit } from '@synckit-js/sdk'
+import type { TaskV2 } from '@/types/ai_v2'
 import { Calendar1, Grid2X2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
+import { useEffect, useState } from 'react'
+import { toast, type ToasterProps, type ToastT } from 'sonner'
 import { Calendar } from '@/components/Calendar'
 import { TaskCard } from '@/components/TaskCard'
 import { Button } from '@/components/ui/button'
 import { ToolLayout } from '@/layouts/toolLayout'
-import { sendBrainDumpToGemini } from '@/services/gemini'
 import { BrainDumpInput } from '../components/BrainDumpInput'
 import { ModeToggle } from '../components/ModeToggle'
 import { SettingsDropdown } from '../components/SettingsDropdown'
+import { useSyncKitDocument, useTaskManagementHandlers } from '@/hooks/useSyncKit'
 
-const DOCUMENT_ID = import.meta.env.VITE_DOCUMENT_ID as string || 'ctc-id'
+
 
 export function MainPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toggleView, setToggleView] = useState(true)
-  const hasInitialized = useRef(false)
-  const sync = useRef(useSyncKit()).current
+  const [message, setMessage] = useState<{ message: string, type: Exclude<ToastT['type'], 'error'> } | null>(null)
+  const { document, updateDocument } = useSyncKitDocument({setError, setMessage})
 
-  // Use SyncKit's React hook - this persists automatically
-  const [document, { update: updateDocument }] = useSyncDocument<StorageDocumentV2>(DOCUMENT_ID)
 
-  const syncState = sync.getSyncState(DOCUMENT_ID)
-
+  const {
+    handleBrainDumpSubmit,
+    handleTaskUpdate,
+    handleClearAllData,
+    handleTaskDelete,
+    deleteAllDoneTasks,
+  } = useTaskManagementHandlers({ document, updateDocument, setIsProcessing, setError, setMessage })
+  
   useEffect(() => {
-    if (!syncState)
-      return
+    if (!message) { return }
 
-    toast.dismiss()
-    if (syncState.state === 'syncing') {
-      toast.loading('Syncing...')
+    const { message: msg, type } = message
+
+    if(type === 'success') {
+      toast.success(msg )
+    } else {
+      toast.info(msg)
     }
-    else if (syncState.state === 'synced') {
-      toast.success('Synced!')
-    }
-    else if (syncState.state === 'error') {
-      toast.error('Sync failed')
-    }
-  }, [syncState])
-
-  // Initialize document if it doesn't exist
-  useEffect(() => {
-    if (hasInitialized.current || document)
-      return
-
-    updateDocument({
-      id: crypto.randomUUID(),
-      tasks: [],
-      weeklyPlan: {
-        id: crypto.randomUUID(),
-        plan: {
-          monday: [],
-          tuesday: [],
-          wednesday: [],
-          thursday: [],
-          friday: [],
-          saturday: [],
-          sunday: [],
-        },
-      },
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    })
-    hasInitialized.current = true
-    toast.info('Initialized new document')
-  }, [])
-
-  const handleBrainDumpSubmit = async (content: string) => {
-    if (!document)
-      return
-
-    try {
-      setIsProcessing(true)
-
-      const response = await sendBrainDumpToGemini(content)
-      console.warn('AI Response:', response)
-
-      // Create new tasks with IDs
-      const newTasks = response.tasks.map(task => ({
-        ...task,
-        id: crypto.randomUUID(),
-        color: undefined,
-        completed: false,
-      }))
-
-      // Merge weekly plan by appending to each day
-      const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const
-      const mergedPlan = { ...document.weeklyPlan?.plan }
-
-      days.forEach((day) => {
-        if (response.weeklyPlan && response.weeklyPlan[day]) {
-          mergedPlan[day] = [...(mergedPlan[day] || []), ...response.weeklyPlan[day]]
-        }
-      })
-
-      updateDocument({
-        ...document,
-        tasks: [...(document.tasks || []), ...newTasks],
-        weeklyPlan: {
-          id: crypto.randomUUID(),
-          plan: mergedPlan,
-        },
-        updatedAt: Date.now(),
-      })
-
-      toast.info('AI generated your weekly plan!')
-    }
-    catch (error) {
-      console.error('Error processing brain dump:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      setError(errorMessage)
-      toast.error(errorMessage)
-    }
-    finally {
-      setIsProcessing(false)
-    }
-  }
-
-  const handleTaskUpdate = (task: Partial<TaskV2>) => {
-    if (!document) {
-      setError('Document not loaded')
-      return
-    }
-
-    if (!task.id) {
-      setError('Task ID is missing')
-      return
-    }
-
-    if (!document.tasks.find(t => t.id === task.id)) {
-      setError('Task not found')
-      return
-    }
-
-    if (Object.keys(task).length <= 1) {
-      setError('No fields to update')
-      return
-    }
-
-    // Update tasks array
-    const updatedTasks = document.tasks.map(t => (t.id === task.id ? { ...t, ...task } : t))
-
-    if (JSON.stringify(document.tasks.find(t => t.id === task.id)) === JSON.stringify(updatedTasks.find(t => t.id === task.id))) {
-      toast.info('Task is unchanged, no updates made')
-      return
-    }
-
-    updateDocument(
-      {
-        ...document,
-        tasks: updatedTasks,
-        updatedAt: Date.now(),
-      },
-    )
-
-    toast.success('Task updated!')
-  }
-
-  const handleClearAllData = async () => {
-    if (!document)
-      return
-
-    updateDocument({
-      ...document,
-      tasks: [],
-      weeklyPlan: {
-        id: crypto.randomUUID(),
-        plan: {
-          monday: [],
-          tuesday: [],
-          wednesday: [],
-          thursday: [],
-          friday: [],
-          saturday: [],
-          sunday: [],
-        },
-      },
-      updatedAt: Date.now(),
-    })
-
-    toast.info('All data cleared.')
-  }
-
-  const handleTaskDelete = async (id: string) => {
-    if (!document) {
-      setError('Document not loaded')
-      return
-    }
-
-    const taskToDelete = document.tasks.find(t => t.id === id)
-    if (!taskToDelete) {
-      setError('Task not found')
-      return
-    }
-
-    const updatedTasks = document.tasks.filter(t => t.id !== id)
-    const originalPlan = document.weeklyPlan?.plan || {}
-    const updatedWeeklyPlan: typeof originalPlan = { ...originalPlan }
-
-    // Remove task from weekly plan if it exists there
-    for (const [day, tasks] of Object.entries(updatedWeeklyPlan)) {
-      updatedWeeklyPlan[day as keyof typeof updatedWeeklyPlan] = tasks.filter(task => task.task !== taskToDelete.title || task.end !== taskToDelete.deadline)
-    }
-
-    updateDocument(
-      {
-        ...document,
-        tasks: updatedTasks,
-        weeklyPlan: {
-          ...document.weeklyPlan,
-          plan: updatedWeeklyPlan,
-        },
-        updatedAt: Date.now(),
-      },
-    )
-
-    toast.success('Task deleted!')
-  }
-
-  const deleteAllDoneTasks = () => {
-    if (!document) {
-      setError('Document not loaded')
-    }
-
-    const updatedTasks = document.tasks.filter(task => !task.completed)
-
-    if (updatedTasks.length === document.tasks.length) {
-      toast.info('No done tasks to delete')
-      return
-    }
-
-    updateDocument({
-      ...document,
-      tasks: updatedTasks,
-      updatedAt: Date.now(),
-    })
-
-    toast.success('All done tasks deleted!')
-  }
+    setMessage(null)
+  }, [message])
 
   // Show loading state while document initializes
   if (!document) {
