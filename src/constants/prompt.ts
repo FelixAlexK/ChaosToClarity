@@ -7,6 +7,6 @@ Organize the tasks into a structured format, categorizing them by priority (High
 Create a weekly plan assigning tasks to each day of the week, with start and end dates in format yyyy-MM-dd.
 Also use the current date as a reference for scheduling.
 The final output should be in JSON format.
-`
+`;
 
-export default META_PROMPT
+export default META_PROMPT;

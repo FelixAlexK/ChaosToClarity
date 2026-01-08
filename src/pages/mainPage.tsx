@@ -1,292 +1,315 @@
-import type { StorageDocumentV2, TaskV2 } from '@/types/ai_v2'
-import { useSyncDocument, useSyncKit } from '@synckit-js/sdk'
-import { Calendar1, Grid2X2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
-import { Calendar } from '@/components/Calendar'
-import { TaskCard } from '@/components/TaskCard'
-import { Button } from '@/components/ui/button'
-import { ToolLayout } from '@/layouts/toolLayout'
-import { sendBrainDumpToGemini } from '@/services/gemini'
-import { BrainDumpInput } from '../components/BrainDumpInput'
-import { ModeToggle } from '../components/ModeToggle'
-import { SettingsDropdown } from '../components/SettingsDropdown'
+import { useSyncDocument, useSyncKit } from "@synckit-js/sdk";
+import { Calendar1, Grid2X2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { Calendar } from "@/components/Calendar";
+import { TaskCard } from "@/components/TaskCard";
+import { Button } from "@/components/ui/button";
+import { ToolLayout } from "@/layouts/toolLayout";
+import { sendBrainDumpToGemini } from "@/services/gemini";
+import type { StorageDocumentV2, TaskV2 } from "@/types/ai_v2";
+import { BrainDumpInput } from "../components/BrainDumpInput";
+import { ModeToggle } from "../components/ModeToggle";
+import { SettingsDropdown } from "../components/SettingsDropdown";
 
-const DOCUMENT_ID = import.meta.env.VITE_DOCUMENT_ID as string || 'ctc-id'
+const DOCUMENT_ID = (import.meta.env.VITE_DOCUMENT_ID as string) || "ctc-id";
 
 export function MainPage() {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [toggleView, setToggleView] = useState(true)
-  const hasInitialized = useRef(false)
-  const sync = useRef(useSyncKit()).current
+	const [isProcessing, setIsProcessing] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [toggleView, setToggleView] = useState(true);
+	const hasInitialized = useRef(false);
+	const sync = useRef(useSyncKit()).current;
 
-  // Use SyncKit's React hook - this persists automatically
-  const [document, { update: updateDocument }] = useSyncDocument<StorageDocumentV2>(DOCUMENT_ID)
+	// Use SyncKit's React hook - this persists automatically
+	const [document, { update: updateDocument }] =
+		useSyncDocument<StorageDocumentV2>(DOCUMENT_ID);
 
-  const syncState = sync.getSyncState(DOCUMENT_ID)
+	const syncState = sync.getSyncState(DOCUMENT_ID);
 
-  useEffect(() => {
-    if (!syncState)
-      return
+	useEffect(() => {
+		if (!syncState) return;
 
-    toast.dismiss()
-    if (syncState.state === 'syncing') {
-      toast.loading('Syncing...')
-    }
-    else if (syncState.state === 'synced') {
-      toast.success('Synced!')
-    }
-    else if (syncState.state === 'error') {
-      toast.error('Sync failed')
-    }
-  }, [syncState])
+		toast.dismiss();
+		if (syncState.state === "syncing") {
+			toast.loading("Syncing...");
+		} else if (syncState.state === "synced") {
+			toast.success("Synced!");
+		} else if (syncState.state === "error") {
+			toast.error("Sync failed");
+		}
+	}, [syncState]);
 
-  // Initialize document if it doesn't exist
-  useEffect(() => {
-    if (hasInitialized.current || document)
-      return
+	// Initialize document if it doesn't exist
+	useEffect(() => {
+		if (hasInitialized.current || document) return;
 
-    updateDocument({
-      id: crypto.randomUUID(),
-      tasks: [],
-      weeklyPlan: {
-        id: crypto.randomUUID(),
-        plan: {
-          monday: [],
-          tuesday: [],
-          wednesday: [],
-          thursday: [],
-          friday: [],
-          saturday: [],
-          sunday: [],
-        },
-      },
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    })
-    hasInitialized.current = true
-    toast.info('Initialized new document')
-  }, [])
+		updateDocument({
+			id: crypto.randomUUID(),
+			tasks: [],
+			weeklyPlan: {
+				id: crypto.randomUUID(),
+				plan: {
+					monday: [],
+					tuesday: [],
+					wednesday: [],
+					thursday: [],
+					friday: [],
+					saturday: [],
+					sunday: [],
+				},
+			},
+			createdAt: Date.now(),
+			updatedAt: Date.now(),
+		});
+		hasInitialized.current = true;
+		toast.info("Initialized new document");
+	}, [document, updateDocument]);
 
-  const handleBrainDumpSubmit = async (content: string) => {
-    if (!document)
-      return
+	const handleBrainDumpSubmit = async (content: string) => {
+		if (!document) return;
 
-    try {
-      setIsProcessing(true)
+		try {
+			setIsProcessing(true);
 
-      const response = await sendBrainDumpToGemini(content)
-      console.warn('AI Response:', response)
+			const response = await sendBrainDumpToGemini(content);
+			console.warn("AI Response:", response);
 
-      // Create new tasks with IDs
-      const newTasks = response.tasks.map(task => ({
-        ...task,
-        id: crypto.randomUUID(),
-        color: undefined,
-        completed: false,
-      }))
+			// Create new tasks with IDs
+			const newTasks = response.tasks.map((task) => ({
+				...task,
+				id: crypto.randomUUID(),
+				color: undefined,
+				completed: false,
+			}));
 
-      // Merge weekly plan by appending to each day
-      const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const
-      const mergedPlan = { ...document.weeklyPlan?.plan }
+			// Merge weekly plan by appending to each day
+			const days = [
+				"monday",
+				"tuesday",
+				"wednesday",
+				"thursday",
+				"friday",
+				"saturday",
+				"sunday",
+			] as const;
+			const mergedPlan = { ...document.weeklyPlan?.plan };
 
-      days.forEach((day) => {
-        if (response.weeklyPlan && response.weeklyPlan[day]) {
-          mergedPlan[day] = [...(mergedPlan[day] || []), ...response.weeklyPlan[day]]
-        }
-      })
+			days.forEach((day) => {
+				if (response.weeklyPlan[day]) {
+					mergedPlan[day] = [
+						...(mergedPlan[day] || []),
+						...response.weeklyPlan[day],
+					];
+				}
+			});
 
-      updateDocument({
-        ...document,
-        tasks: [...(document.tasks || []), ...newTasks],
-        weeklyPlan: {
-          id: crypto.randomUUID(),
-          plan: mergedPlan,
-        },
-        updatedAt: Date.now(),
-      })
+			updateDocument({
+				...document,
+				tasks: [...(document.tasks || []), ...newTasks],
+				weeklyPlan: {
+					id: crypto.randomUUID(),
+					plan: mergedPlan,
+				},
+				updatedAt: Date.now(),
+			});
 
-      toast.info('AI generated your weekly plan!')
-    }
-    catch (error) {
-      console.error('Error processing brain dump:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      setError(errorMessage)
-      toast.error(errorMessage)
-    }
-    finally {
-      setIsProcessing(false)
-    }
-  }
+			toast.info("AI generated your weekly plan!");
+		} catch (error) {
+			console.error("Error processing brain dump:", error);
+			const errorMessage =
+				error instanceof Error ? error.message : "Unknown error";
+			setError(errorMessage);
+			toast.error(errorMessage);
+		} finally {
+			setIsProcessing(false);
+		}
+	};
 
-  const handleTaskUpdate = (task: Partial<TaskV2>) => {
-    if (!document) {
-      setError('Document not loaded')
-      return
-    }
+	const handleTaskUpdate = (task: Partial<TaskV2>) => {
+		if (!document) {
+			setError("Document not loaded");
+			return;
+		}
 
-    if (!task.id) {
-      setError('Task ID is missing')
-      return
-    }
+		if (!task.id) {
+			setError("Task ID is missing");
+			return;
+		}
 
-    if (!document.tasks.find(t => t.id === task.id)) {
-      setError('Task not found')
-      return
-    }
+		if (!document.tasks.find((t) => t.id === task.id)) {
+			setError("Task not found");
+			return;
+		}
 
-    if (Object.keys(task).length <= 1) {
-      setError('No fields to update')
-      return
-    }
+		if (Object.keys(task).length <= 1) {
+			setError("No fields to update");
+			return;
+		}
 
-    // Update tasks array
-    const updatedTasks = document.tasks.map(t => (t.id === task.id ? { ...t, ...task } : t))
+		// Update tasks array
+		const updatedTasks = document.tasks.map((t) =>
+			t.id === task.id ? { ...t, ...task } : t,
+		);
 
-    if (JSON.stringify(document.tasks.find(t => t.id === task.id)) === JSON.stringify(updatedTasks.find(t => t.id === task.id))) {
-      toast.info('Task is unchanged, no updates made')
-      return
-    }
+		if (
+			JSON.stringify(document.tasks.find((t) => t.id === task.id)) ===
+			JSON.stringify(updatedTasks.find((t) => t.id === task.id))
+		) {
+			toast.info("Task is unchanged, no updates made");
+			return;
+		}
 
-    updateDocument(
-      {
-        ...document,
-        tasks: updatedTasks,
-        updatedAt: Date.now(),
-      },
-    )
+		updateDocument({
+			...document,
+			tasks: updatedTasks,
+			updatedAt: Date.now(),
+		});
 
-    toast.success('Task updated!')
-  }
+		toast.success("Task updated!");
+	};
 
-  const handleClearAllData = async () => {
-    if (!document)
-      return
+	const handleClearAllData = async () => {
+		if (!document) return;
 
-    updateDocument({
-      ...document,
-      tasks: [],
-      weeklyPlan: {
-        id: crypto.randomUUID(),
-        plan: {
-          monday: [],
-          tuesday: [],
-          wednesday: [],
-          thursday: [],
-          friday: [],
-          saturday: [],
-          sunday: [],
-        },
-      },
-      updatedAt: Date.now(),
-    })
+		updateDocument({
+			...document,
+			tasks: [],
+			weeklyPlan: {
+				id: crypto.randomUUID(),
+				plan: {
+					monday: [],
+					tuesday: [],
+					wednesday: [],
+					thursday: [],
+					friday: [],
+					saturday: [],
+					sunday: [],
+				},
+			},
+			updatedAt: Date.now(),
+		});
 
-    toast.info('All data cleared.')
-  }
+		toast.info("All data cleared.");
+	};
 
-  const handleTaskDelete = async (id: string) => {
-    if (!document) {
-      setError('Document not loaded')
-      return
-    }
+	const handleTaskDelete = async (id: string) => {
+		if (!document) {
+			setError("Document not loaded");
+			return;
+		}
 
-    const taskToDelete = document.tasks.find(t => t.id === id)
-    if (!taskToDelete) {
-      setError('Task not found')
-      return
-    }
+		const taskToDelete = document.tasks.find((t) => t.id === id);
+		if (!taskToDelete) {
+			setError("Task not found");
+			return;
+		}
 
-    const updatedTasks = document.tasks.filter(t => t.id !== id)
-    const originalPlan = document.weeklyPlan?.plan || {}
-    const updatedWeeklyPlan: typeof originalPlan = { ...originalPlan }
+		const updatedTasks = document.tasks.filter((t) => t.id !== id);
+		const originalPlan = document.weeklyPlan?.plan || {};
+		const updatedWeeklyPlan: typeof originalPlan = { ...originalPlan };
 
-    // Remove task from weekly plan if it exists there
-    for (const [day, tasks] of Object.entries(updatedWeeklyPlan)) {
-      updatedWeeklyPlan[day as keyof typeof updatedWeeklyPlan] = tasks.filter(task => task.task !== taskToDelete.title || task.end !== taskToDelete.deadline)
-    }
+		// Remove task from weekly plan if it exists there
+		for (const [day, tasks] of Object.entries(updatedWeeklyPlan)) {
+			updatedWeeklyPlan[day as keyof typeof updatedWeeklyPlan] = tasks.filter(
+				(task) =>
+					task.task !== taskToDelete.title ||
+					task.end !== taskToDelete.deadline,
+			);
+		}
 
-    updateDocument(
-      {
-        ...document,
-        tasks: updatedTasks,
-        weeklyPlan: {
-          ...document.weeklyPlan,
-          plan: updatedWeeklyPlan,
-        },
-        updatedAt: Date.now(),
-      },
-    )
+		updateDocument({
+			...document,
+			tasks: updatedTasks,
+			weeklyPlan: {
+				...document.weeklyPlan,
+				plan: updatedWeeklyPlan,
+			},
+			updatedAt: Date.now(),
+		});
 
-    toast.success('Task deleted!')
-  }
+		toast.success("Task deleted!");
+	};
 
-  const deleteAllDoneTasks = () => {
-    if (!document) {
-      setError('Document not loaded')
-    }
+	const deleteAllDoneTasks = () => {
+		if (!document) {
+			setError("Document not loaded");
+		}
 
-    const updatedTasks = document.tasks.filter(task => !task.completed)
+		const updatedTasks = document.tasks.filter((task) => !task.completed);
 
-    if (updatedTasks.length === document.tasks.length) {
-      toast.info('No done tasks to delete')
-      return
-    }
+		if (updatedTasks.length === document.tasks.length) {
+			toast.info("No done tasks to delete");
+			return;
+		}
 
-    updateDocument({
-      ...document,
-      tasks: updatedTasks,
-      updatedAt: Date.now(),
-    })
+		updateDocument({
+			...document,
+			tasks: updatedTasks,
+			updatedAt: Date.now(),
+		});
 
-    toast.success('All done tasks deleted!')
-  }
+		toast.success("All done tasks deleted!");
+	};
 
-  // Show loading state while document initializes
-  if (!document) {
-    toast.loading('Syncing data...')
-  }
+	// Show loading state while document initializes
+	if (!document) {
+		toast.loading("Syncing data...");
+	}
 
-  if (error) {
-    toast.error(`${error}`)
-    setError(null)
-  }
+	if (error) {
+		toast.error(`${error}`);
+		setError(null);
+	}
 
-  return (
-    <>
-      <header className="mb-4 lg:mb-8 ">
-        <div className="flex flex-row w-full justify-between items-center lg:mx-auto lg:max-w-4xl">
-          <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">Chaos to Clarity</h1>
-          <div className="flex gap-2 ">
-            <Button variant="outline" onClick={() => setToggleView(!toggleView)}>{toggleView ? <Calendar1></Calendar1> : <Grid2X2></Grid2X2>}</Button>
-            <ModeToggle />
-            <SettingsDropdown deleteAllDoneTasks={deleteAllDoneTasks} clearAllData={handleClearAllData}></SettingsDropdown>
-          </div>
-        </div>
-      </header>
+	return (
+		<>
+			<header className="mb-4 lg:mb-8 ">
+				<div className="flex flex-row w-full justify-between items-center lg:mx-auto lg:max-w-4xl">
+					<h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
+						Chaos to Clarity
+					</h1>
+					<div className="flex gap-2 ">
+						<Button
+							variant="outline"
+							onClick={() => setToggleView(!toggleView)}
+						>
+							{toggleView ? <Calendar1></Calendar1> : <Grid2X2></Grid2X2>}
+						</Button>
+						<ModeToggle />
+						<SettingsDropdown
+							deleteAllDoneTasks={deleteAllDoneTasks}
+							clearAllData={handleClearAllData}
+						></SettingsDropdown>
+					</div>
+				</div>
+			</header>
 
-      <ToolLayout>
-        <div className="w-full lg:mx-auto lg:max-w-4xl  ">
-          <BrainDumpInput onSubmit={handleBrainDumpSubmit} isProcessing={isProcessing} />
-        </div>
+			<ToolLayout>
+				<div className="w-full lg:mx-auto lg:max-w-4xl  ">
+					<BrainDumpInput
+						onSubmit={handleBrainDumpSubmit}
+						isProcessing={isProcessing}
+					/>
+				</div>
 
-        <div className="w-full lg:mx-auto lg:max-w-4xl  ">
-          {toggleView
-            ? (
-                <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
-                  {document.tasks?.map((task, index) => (
-                    <TaskCard
-                      deleteTask={handleTaskDelete}
-                      updateTask={handleTaskUpdate}
-                      key={task.id || index}
-                      task={task}
-                    />
-                  ))}
-                </div>
-              )
-            : <Calendar weeklyPlan={document.weeklyPlan} />}
-        </div>
-      </ToolLayout>
-    </>
-  )
+				<div className="w-full lg:mx-auto lg:max-w-4xl  ">
+					{toggleView ? (
+						<div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
+							{document.tasks?.map((task, index) => (
+								<TaskCard
+									deleteTask={handleTaskDelete}
+									updateTask={handleTaskUpdate}
+									key={task.id || index}
+									task={task}
+								/>
+							))}
+						</div>
+					) : (
+						<Calendar weeklyPlan={document.weeklyPlan} />
+					)}
+				</div>
+			</ToolLayout>
+		</>
+	);
 }
