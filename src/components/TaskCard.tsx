@@ -42,16 +42,28 @@ export function TaskCard({ task, updateTask, deleteTask }: TaskCardsProps) {
     setIsEditing(false)
   }
 
-  const handleMarkTaskAsDone = (isCompleted: boolean) => {
-    setCompleted(isCompleted)
-    updateTask({
-      id: task.id,
-      completed: isCompleted,
-    })
-  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isEditing) {
+      setIsEditing(false)
+      // Reset fields to original values
+      setNewTitle(task.title)
+      setNewCategory(task.category)
+      setNewPriority(task.priority)
+      setNewEstimatedTime(task.estimated_time)
+      setNewDeadline(task.deadline)
 
-  if (completed && !isEditing) {
-    return <TaskCardDelete deleteTask={deleteTask} markedAsDone={() => handleMarkTaskAsDone(!completed)} task={task} />
+      toast.info('Edit cancelled')
+      e.preventDefault()
+    }
+
+    if (e.key === 'Enter' && isEditing) {
+      handleSave()
+      e.preventDefault()
+    }
+  })
+
+  if(markedAsDone) {
+    return <TaskCardDelete deleteTask={deleteTask} markedAsDone={() => setMarkedAsDone(false)} task={task} />
   }
 
   return (
@@ -173,7 +185,9 @@ function TaskCardDetail({ label, value, className }: { label: string, value: str
   )
 }
 
-function TaskCardDelete({ task, markedAsDone, deleteTask }: { task: TaskV2, markedAsDone: () => void, deleteTask: (id: string) => void }) {
+function TaskCardDelete({ task, markedAsDone, deleteTask }: { task: Task, markedAsDone: () => void, deleteTask: (id: string) => void }) {
+
+
   return (
     <Card onClick={markedAsDone} className="bg-muted-foreground/20 border-muted-foreground/60">
       <CardHeader>
